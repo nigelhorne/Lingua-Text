@@ -10,4 +10,6 @@ t/links.t
 t/no404s.t
 t/pod-cm.t
 t/pod.t
+t/spelling.t
+t/strict.t
 t/string.t
