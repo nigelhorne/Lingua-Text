@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 11;
+use Test::Most tests => 12;
 use Test::NoWarnings;
 
 BEGIN {
@@ -28,4 +28,7 @@ STRING: {
 	is($str->as_string('fr'), 'Bonjour', 'French');
 	is($str, 'Hello', 'calls as_string');
 	is($str->as_string({ lang => 'es' }), undef, 'Spanish');
+
+	$str->set(lang => 'en', string => 'Goodbye');
+	is($str->as_string(), 'Goodbye', 'Set works');
 }
