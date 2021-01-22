@@ -2,6 +2,7 @@ package Lingua::String;
 
 use strict;
 use warnings;
+use Carp;
 
 =head1 NAME
 
@@ -27,6 +28,20 @@ use overload (
 
 Hold many strings in one object.
 
+    use Lingua::String;
+
+    my $str = Lingua::String->new();
+
+    $str->fr('Bonjour Tout le Monde');
+    $str->en('Hello, World');
+
+    $ENV{'LANG'} = 'en_GB';
+    print "$str\n";	# Prints Hello, World
+    $ENV{'LANG'} = 'fr_FR';
+    print "$str\n";	# Prints Bonjour Tout le Monde
+    $LANG{'LANG'} = 'de_DE';
+    print "$str\n";	# Prints nothing
+
 =cut
 
 =head1 METHODS
@@ -49,6 +64,14 @@ sub new {
 
 =head2 set
 
+Sets a string in a language.
+
+    $str->set({ string => 'House', lang => 'en' });
+
+Autoload will do this for you as
+
+    $str->en('House');
+
 =cut
 
 sub set {
@@ -69,6 +92,7 @@ sub set {
 		$lang ||= $self->_get_language();
 		if(!defined($lang)) {
 			Carp::croak(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+			return;
 		}
 	}
 
@@ -76,6 +100,7 @@ sub set {
 
 	if(!defined($string)) {
 		Carp::croak(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+		return;
 	}
 
 	$self->{$lang} = $string;
@@ -101,10 +126,38 @@ sub _get_language {
 	}
 }
 
+=head2 as_string
+
+Returns the string in the language requested in the parameter.
+If that parameter is not given, the system language is used.
+
+	print $string->as_string(), "\n";
+	print $string->as_string('fr'), "\n";
+	print $string->as_string({ lang => 'en' }), "\n";
+
+=cut
+
 sub as_string {
 	my $self = shift;
-	my $lang = shift || $self->_get_language();
+	my %params;
 
+	if(ref($_[0]) eq 'HASH') {
+		%params = %{$_[0]};
+	} elsif(scalar(@_) == 0) {
+		# $params{'lang'} = $self->_get_language();
+	} elsif(scalar(@_) % 2 == 0) {
+		if(defined($_[0])) {
+			%params = @_;
+		}
+	} else {
+		$params{'lang'} = shift;
+	}
+	my $lang = $params{'lang'} || $self->_get_language();
+
+	if(!defined($lang)) {
+		Carp::croak(__PACKAGE__, ': usage: as_string(lang => $language)');
+		return;
+	}
 	return $self->{$lang};
 }
 
