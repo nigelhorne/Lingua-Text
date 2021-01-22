@@ -5,7 +5,7 @@ use warnings;
 
 =head1 NAME
 
-Lingua::String - 
+Lingua::String - Class to contain a string in many different languages
 
 =head1 VERSION
 
@@ -22,6 +22,12 @@ use overload (
         bool => sub { 1 },
         fallback => 1   # So that boolean tests don't cause as_string to be called
 );
+
+=head1 SYNOPSIS
+
+Hold many strings in one object.
+
+=cut
 
 =head1 METHODS
 
