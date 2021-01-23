@@ -69,7 +69,7 @@ sub new {
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {
-		Carp::croak(__PACKAGE__, ': usage: new(%args)');
+		Carp::carp(__PACKAGE__, ': usage: new(%args)');
 		return;
 	}
 
@@ -105,7 +105,7 @@ sub set {
 	if(!defined($lang)) {
 		$lang ||= $self->_get_language();
 		if(!defined($lang)) {
-			Carp::croak(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+			Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
 			return;
 		}
 	}
@@ -113,7 +113,7 @@ sub set {
 	my $string = $params{'string'};
 
 	if(!defined($string)) {
-		Carp::croak(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
 		return;
 	}
 
@@ -169,7 +169,7 @@ sub as_string {
 	my $lang = $params{'lang'} || $self->_get_language();
 
 	if(!defined($lang)) {
-		Carp::croak(__PACKAGE__, ': usage: as_string(lang => $language)');
+		Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
 		return;
 	}
 	return $self->{$lang};
