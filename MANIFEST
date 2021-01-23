@@ -17,3 +17,4 @@ t/pod.t
 t/spelling.t
 t/strict.t
 t/string.t
+t/vars.t
