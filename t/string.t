@@ -11,6 +11,8 @@ BEGIN {
 
 STRING: {
 	delete $ENV{'LANGUAGE'};
+	delete $ENV{'LC_ALL'};
+	delete $ENV{'LANG'};
 	$ENV{'LC_MESSAGES'} = 'en_GB';
 
 	my $str = new_ok('Lingua::String');
