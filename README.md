@@ -30,6 +30,10 @@ Hold many strings in one object.
 
 Create a Lingua::String object.
 
+    use Lingua::String;
+
+    my $str = Lingua::String->new({ 'en' => 'Here', 'fr' => 'Ici' });
+
 ## set
 
 Sets a string in a language.
@@ -45,9 +49,9 @@ Autoload will do this for you as
 Returns the string in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
-        print $string->as_string(), "\n";
-        print $string->as_string('fr'), "\n";
-        print $string->as_string({ lang => 'en' }), "\n";
+    print $string->as_string(), "\n";
+    print $string->as_string('fr'), "\n";
+    print $string->as_string({ lang => 'en' }), "\n";
 
 # AUTHOR
 

@@ -146,6 +146,7 @@ sub _get_language {
 Returns the string in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
+    my $string = Lingua::String->new(en => 'boat', fr => 'bateau'); 
     print $string->as_string(), "\n";
     print $string->as_string('fr'), "\n";
     print $string->as_string({ lang => 'en' }), "\n";
@@ -185,6 +186,8 @@ sub AUTOLOAD {
 	return if($key eq 'DESTROY');
 
 	my $self = shift;
+
+	return if(ref($self) ne __PACKAGE__);
 
 	if(my $value = shift) {
 		$self->{$key} = $value;
