@@ -49,6 +49,7 @@ Autoload will do this for you as
 Returns the string in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
+    my $string = Lingua::String->new(en => 'boat', fr => 'bateau'); 
     print $string->as_string(), "\n";
     print $string->as_string('fr'), "\n";
     print $string->as_string({ lang => 'en' }), "\n";
