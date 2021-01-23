@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 12;
+use Test::Most tests => 14;
 use Test::NoWarnings;
 
 BEGIN {
@@ -15,11 +15,11 @@ STRING: {
 
 	my $str = new_ok('Lingua::String');
 
-	$str->en('Hello');
+	is($str->en('Hello'), 'Hello', 'Set English');
 
 	is($str->as_string(), 'Hello', 'English');
 
-	$str->fr('Bonjour');
+	is($str->fr('Bonjour'), 'Bonjour', 'Set French');
 
 	is($str->as_string(), 'Hello', 'English');
 	is($str->fr(), 'Bonjour', 'French');
