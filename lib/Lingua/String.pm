@@ -138,6 +138,7 @@ sub _get_language {
 			return lc($1);
 		}
 	}
+	return;	# undef
 }
 
 =head2 as_string
