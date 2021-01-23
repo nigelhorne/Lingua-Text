@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 16;
+use Test::Most tests => 22;
 use Test::NoWarnings;
 
 BEGIN {
@@ -35,5 +35,14 @@ STRING: {
 	$ENV{'LC_MESSAGES'} = 'en_GB';
 
 	is($str->set(lang => 'en', string => 'Goodbye'), 'Goodbye', 'Set Goodbye');
-	is($str->as_string(), 'Goodbye', 'Set works');
+	is($str->as_string(), 'Goodbye', 'Set works with explicit language');
+	is($str->set('House'), 'House', 'Set House');
+	is($str->as_string(), 'House', 'Set works with implicit language');
+	$ENV{'LC_MESSAGES'} = 'fr_FR';
+	is($str->as_string(), 'Bonjour', 'Implicit language sets the correct place');
+	$ENV{'LC_MESSAGES'} = 'en_GB';
+
+	$str = new_ok('Lingua::String' => [ ('en' => 'and', 'fr' => 'et', 'de' => 'und') ]);
+	is($str->de(), 'und', 'Initialisation list of strings works');
+	is($str, 'and', 'Initialisation list works with overload');
 }
