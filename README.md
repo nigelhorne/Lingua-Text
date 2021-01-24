@@ -54,6 +54,13 @@ If that parameter is not given, the system language is used.
     print $string->as_string('fr'), "\n";
     print $string->as_string({ lang => 'en' }), "\n";
 
+## encode
+
+Turns the encapsulated strings into HTML entities
+
+    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode(); 
+    print $string->fr(), "\n";  # Prints &eacute;tude
+
 # AUTHOR
 
 Nigel Horne, `<njh at bandsman.co.uk>`
@@ -99,3 +106,11 @@ You can also look for information at:
 Copyright 2021 Nigel Horne.
 
 This program is released under the following licence: GPL2
+
+# POD ERRORS
+
+Hey! **The above document had some coding errors, which are explained below:**
+
+- Around line 192:
+
+    Non-ASCII character seen before =encoding in ''étude')->encode();'. Assuming UTF-8

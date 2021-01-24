@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 22;
+use Test::Most tests => 26;
 use Test::NoWarnings;
 
 BEGIN {
@@ -47,4 +47,9 @@ STRING: {
 	$str = new_ok('Lingua::String' => [ ('en' => 'and', 'fr' => 'et', 'de' => 'und') ]);
 	is($str->de(), 'und', 'Initialisation list of strings works');
 	is($str, 'and', 'Initialisation list works with overload');
+
+	$str = new_ok('Lingua::String' => [ ('en' => 'hotel', 'fr' => 'hôtel') ])->encode();
+	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - UTF8');
+	$str = new_ok('Lingua::String' => [ ('en' => 'hotel', 'fr' => "h\N{U+00F4}tel") ])->encode();
+	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - Unicode');
 }

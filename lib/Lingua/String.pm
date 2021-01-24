@@ -3,6 +3,7 @@ package Lingua::String;
 use strict;
 use warnings;
 use Carp;
+use HTML::Entities;
 
 =head1 NAME
 
@@ -61,7 +62,11 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	# Use Lingua::String->new, not Lingua::String::new
-	return unless($class);
+	if(!defined($class)) {
+		# https://github.com/nigelhorne/Lingua-String/issues/1
+		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		return;
+	}
 
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
@@ -73,7 +78,10 @@ sub new {
 		return;
 	}
 
-	return bless { %params }, $class;
+	if(scalar(%params)) {
+		return bless { strings => \%params }, $class;
+	}
+	return bless { }, $class;
 }
 
 =head2 set
@@ -117,7 +125,7 @@ sub set {
 		return;
 	}
 
-	$self->{$lang} = $string;
+	$self->{'strings'}->{$lang} = $string;
 
 	return $self;
 }
@@ -174,7 +182,26 @@ sub as_string {
 		Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
 		return;
 	}
-	return $self->{$lang};
+	return $self->{'strings'}->{$lang};
+}
+
+=head2 encode
+
+Turns the encapsulated strings into HTML entities
+
+    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode(); 
+    print $string->fr(), "\n";	# Prints &eacute;tude
+
+=cut
+
+sub encode {
+	my $self = shift;
+
+	while(my($k, $v) = each(%{$self->{'strings'}})) {
+		utf8::decode($v);
+		$self->{'strings'}->{$k} = HTML::Entities::encode_entities($v);
+	}
+	return $self;
 }
 
 sub AUTOLOAD {
@@ -190,10 +217,10 @@ sub AUTOLOAD {
 	return if(ref($self) ne __PACKAGE__);
 
 	if(my $value = shift) {
-		$self->{$key} = $value;
+		$self->{'strings'}->{$key} = $value;
 	}
 
-	return $self->{$key};
+	return $self->{'strings'}->{$key};
 }
 
 =head1 AUTHOR
