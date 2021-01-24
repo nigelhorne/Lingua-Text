@@ -154,7 +154,7 @@ sub _get_language {
 Returns the string in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
-    my $string = Lingua::String->new(en => 'boat', fr => 'bateau'); 
+    my $string = Lingua::String->new(en => 'boat', fr => 'bateau');
     print $string->as_string(), "\n";
     print $string->as_string('fr'), "\n";
     print $string->as_string({ lang => 'en' }), "\n";
@@ -187,9 +187,11 @@ sub as_string {
 
 =head2 encode
 
+=encoding utf-8
+
 Turns the encapsulated strings into HTML entities
 
-    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode(); 
+    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode();
     print $string->fr(), "\n";	# Prints &eacute;tude
 
 =cut

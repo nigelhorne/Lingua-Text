@@ -49,7 +49,7 @@ Autoload will do this for you as
 Returns the string in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
-    my $string = Lingua::String->new(en => 'boat', fr => 'bateau'); 
+    my $string = Lingua::String->new(en => 'boat', fr => 'bateau');
     print $string->as_string(), "\n";
     print $string->as_string('fr'), "\n";
     print $string->as_string({ lang => 'en' }), "\n";
@@ -58,7 +58,7 @@ If that parameter is not given, the system language is used.
 
 Turns the encapsulated strings into HTML entities
 
-    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode(); 
+    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode();
     print $string->fr(), "\n";  # Prints &eacute;tude
 
 # AUTHOR
@@ -66,6 +66,9 @@ Turns the encapsulated strings into HTML entities
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
+
+There's no decode() (yet) so you'll have to be extra careful to avoid
+double encoding.
 
 # SEE ALSO
 
@@ -105,12 +108,7 @@ You can also look for information at:
 
 Copyright 2021 Nigel Horne.
 
-This program is released under the following licence: GPL2
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 192:
-
-    Non-ASCII character seen before =encoding in ''étude')->encode();'. Assuming UTF-8
+This program is released under the following licence: GPL2 for personal use on
+a single computer.
+All other users (for example Commercial, Charity, Educational, Government)
+must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nigelhorne.com>\`.
