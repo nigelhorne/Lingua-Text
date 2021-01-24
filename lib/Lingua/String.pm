@@ -229,6 +229,9 @@ Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
 
+There's no decode() (yet) so you'll have to be extra careful to avoid
+double encoding.
+
 =head1 SEE ALSO
 
 =head1 SUPPORT
@@ -271,7 +274,10 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 Copyright 2021 Nigel Horne.
 
-This program is released under the following licence: GPL2
+This program is released under the following licence: GPL2 for personal use on
+a single computer.
+All other users (for example Commercial, Charity, Educational, Government)
+must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
 
 =cut
 
