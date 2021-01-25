@@ -1,8 +1,7 @@
 #!perl -wT
 
 use strict;
-
-use lib 'lib';
+use warnings;
 use Test::Most tests => 2;
 use Lingua::String;
 
