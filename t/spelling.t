@@ -19,7 +19,7 @@ if($ENV{AUTHOR_TESTING}) {
 
 __END__
 CPANTS
+GPL
 MetaCPAN
 RT
-Rothenberg
 lang
