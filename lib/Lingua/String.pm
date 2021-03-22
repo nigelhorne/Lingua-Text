@@ -43,6 +43,8 @@ Hold many strings in one object.
     $LANG{'LANG'} = 'de_DE';
     print "$str\n";	# Prints nothing
 
+    $string = Lingua::String->new('hello');	# Initialises the 'current' language
+
 =cut
 
 =head1 METHODS
@@ -71,6 +73,8 @@ sub new {
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
+	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
+		%params = ($lang => $_[0]);
 	} elsif(scalar(@_) % 2 == 0) {
 		%params = @_;
 	} else {

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 26;
+use Test::Most tests => 29;
 use Test::NoWarnings;
 
 BEGIN {
@@ -52,4 +52,8 @@ STRING: {
 	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - UTF8');
 	$str = new_ok('Lingua::String' => [ ('en' => 'hotel', 'fr' => "h\N{U+00F4}tel") ])->encode();
 	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - Unicode');
+
+	$str = new_ok('Lingua::String' => [ 'One' ]);
+	is($str->en(), 'One', 'Default language is set on single argument');
+	is($str->as_string({ lang => 'de' }), undef, 'German');
 }
