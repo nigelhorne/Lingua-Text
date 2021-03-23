@@ -50,7 +50,7 @@ STRING: {
 
 	$str = new_ok('Lingua::String' => [ ('en' => 'hotel', 'fr' => 'hôtel') ])->encode();
 	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - UTF8');
-	$str = new_ok('Lingua::String' => [ ('en' => 'hotel', 'fr' => "h\N{U+00F4}tel") ])->encode();
+	$str = new_ok('Lingua::String' => [ {'en' => 'hotel', 'fr' => "h\N{U+00F4}tel"} ])->encode();
 	is($str->fr(), 'h&ocirc;tel', 'HTML Entities encode - Unicode');
 
 	$str = new_ok('Lingua::String' => [ 'One' ]);

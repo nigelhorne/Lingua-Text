@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Test::Carp;
-use Test::Most tests => 5;
+use Test::Most tests => 6;
 
 BEGIN {
 	use_ok('Lingua::String');
@@ -22,4 +22,8 @@ CARP: {
 	$str = new_ok('Lingua::String' => [ \('en' => 'and', 'fr' => 'et', 'de' => 'und') ]);
 
 	does_carp_that_matches(sub { $str->as_string() }, qr/usage/);
+
+	$ENV{'LANGUAGE'} = 'en_GB';
+
+	does_carp_that_matches(sub { $str = Lingua::String->new('one', 'two', 'three') }, qr/usage/);
 }
