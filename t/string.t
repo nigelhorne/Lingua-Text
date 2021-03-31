@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 29;
+use Test::Most tests => 32;
 use Test::NoWarnings;
 
 BEGIN {
@@ -36,7 +36,10 @@ STRING: {
 	is($str, 'Bonjour', 'calls as_string in French');
 	$ENV{'LC_MESSAGES'} = 'en_GB';
 
-	is($str->set(lang => 'en', string => 'Goodbye'), 'Goodbye', 'Set Goodbye');
+	is($str->set({ lang => 'en', string => 'xyzzy' }), 'xyzzy', 'Set xyzzy hash ref');
+	is($str->as_string(), 'xyzzy', 'Set works with explicit language');
+	is($str->set(lang => 'en', string => 'Goodbye'), 'Goodbye', 'Set Goodbye hash');
+	is($str->as_string(), 'Goodbye', 'Set works with explicit language');
 	is($str->as_string(), 'Goodbye', 'Set works with explicit language');
 	is($str->set('House'), 'House', 'Set House');
 	is($str->as_string(), 'House', 'Set works with implicit language');
