@@ -65,9 +65,10 @@ sub new {
 
 	# Use Lingua::String->new, not Lingua::String::new
 	if(!defined($class)) {
-		# https://github.com/nigelhorne/Lingua-String/issues/1
-		Carp::carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		return;
+		# Using Lingua::String->new(), not Lingua::String::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
 	}
 
 	my %params;
