@@ -269,10 +269,6 @@ L<http://cpants.cpanauthors.org/dist/Lingua-String>
 
 L<http://matrix.cpantesters.org/?dist=Lingua-String>
 
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Lingua-String>
-
 =item * CPAN Testers Dependencies
 
 L<http://deps.cpantesters.org/?module=Lingua-String>
@@ -281,7 +277,7 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021 Nigel Horne.
+Copyright 2021-2022 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
