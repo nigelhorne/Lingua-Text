@@ -5,6 +5,8 @@ use warnings;
 use Carp;
 use HTML::Entities;
 
+# TODO: Investigate Locale::Maketext
+
 =head1 NAME
 
 Lingua::String - Class to contain a string in many different languages
