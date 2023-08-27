@@ -42,10 +42,10 @@ Hold many strings in one object.
     print "$str\n";	# Prints Hello, World
     $ENV{'LANG'} = 'fr_FR';
     print "$str\n";	# Prints Bonjour Tout le Monde
-    $LANG{'LANG'} = 'de_DE';
+    $ENV{'LANG'} = 'de_DE';
     print "$str\n";	# Prints nothing
 
-    $string = Lingua::String->new('hello');	# Initialises the 'current' language
+    my $string = Lingua::String->new('hello');	# Initialises the 'current' language
 
 =cut
 
