@@ -65,28 +65,30 @@ sub new {
 	my $proto = shift;
 	my $class = ref($proto) || $proto;
 
-	# Use Lingua::String->new, not Lingua::String::new
-	if(!defined($class)) {
-		# Using Lingua::String->new(), not Lingua::String::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
-		$class = __PACKAGE__;
-	}
-
-	my %params;
+	my %args;
 	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
+		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
-		%params = ($lang => $_[0]);
+		%args = ($lang => $_[0]);
 	} elsif(scalar(@_) % 2 == 0) {
-		%params = @_;
+		%args = @_;
 	} else {
 		Carp::carp(__PACKAGE__, ': usage: new(%args)');
 		return;
 	}
 
-	if(scalar(%params)) {
-		return bless { strings => \%params }, $class;
+	if(!defined($class)) {
+		# Using Lingua::String->new(), not Lingua::String::new()
+		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+		# return;
+		$class = __PACKAGE__;
+	} elsif(ref($class)) {
+		# clone the given object
+		return bless { %{$class}, %args }, ref($class);
+	}
+
+	if(scalar(%args)) {
+		return bless { strings => \%args }, $class;
 	}
 	return bless { }, $class;
 }
