@@ -29,7 +29,8 @@ use overload (
 
 =head1 SYNOPSIS
 
-Hold many strings in one object.
+Hold many strings in one object,
+thereby encapsulating internationalized text.
 
     use Lingua::String;
 
@@ -282,7 +283,7 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021-2022 Nigel Horne.
+Copyright 2021-2024 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
