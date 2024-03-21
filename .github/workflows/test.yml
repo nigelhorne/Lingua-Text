@@ -1,5 +1,6 @@
 ---
 # See https://github.com/actions/virtual-environments
+# https://github.com/marketplace/actions/setup-perl-environment
 
 name: Test Code
 on:
@@ -9,6 +10,8 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+  schedule:
+    - cron: '12 23 21 * *'
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -16,13 +19,10 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-11
-          - macos-10.15
-          - ubuntu-20.04
-          - ubuntu-18.04
-          - windows-2022
-          - windows-2019
-        perl: ['5.34', '5.32', '5.30', '5.28']
+          - macos-latest
+          - ubuntu-latest
+          - windows-latest
+        perl: ['5.38', '5.36', '5.34', '5.32', '5.30', '5.28', '5.22']
     name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
