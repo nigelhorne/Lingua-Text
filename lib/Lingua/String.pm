@@ -63,10 +63,9 @@ Create a Lingua::String object.
 =cut
 
 sub new {
-	my $proto = shift;
-	my $class = ref($proto) || $proto;
-
+	my $class = shift;
 	my %args;
+
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
