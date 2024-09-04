@@ -111,7 +111,7 @@ sub set {
 	my %params;
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		%params = @_;
 	} else {
 		$params{'string'} = shift;
@@ -120,7 +120,7 @@ sub set {
 	my $lang = $params{'lang'};
 
 	if(!defined($lang)) {
-		$lang ||= $self->_get_language();
+		$lang = $self->_get_language();
 		if(!defined($lang)) {
 			Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
 			return;
