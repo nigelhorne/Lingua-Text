@@ -70,7 +70,7 @@ sub new {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
 		%args = ($lang => $_[0]);
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		%args = @_;
 	} else {
 		Carp::carp(__PACKAGE__, ': usage: new(%args)');
@@ -107,17 +107,9 @@ Autoload will do this for you as
 
 sub set {
 	my $self = shift;
+	my $params = $self->_get_params('string', @_);
 
-	my %params;
-	if(ref($_[0]) eq 'HASH') {
-		%params = %{$_[0]};
-	} elsif((scalar(@_) % 2) == 0) {
-		%params = @_;
-	} else {
-		$params{'string'} = shift;
-	}
-
-	my $lang = $params{'lang'};
+	my $lang = $params->{'lang'};
 
 	if(!defined($lang)) {
 		$lang = $self->_get_language();
@@ -127,7 +119,7 @@ sub set {
 		}
 	}
 
-	my $string = $params{'string'};
+	my $string = $params->{'string'};
 
 	if(!defined($string)) {
 		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
@@ -235,6 +227,41 @@ sub AUTOLOAD {
 	}
 
 	return $self->{'strings'}->{$key};
+}
+
+# Helper routine to parse the arguments given to a function,
+#	allowing the caller to call the function in anyway that they want
+#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
+#	when called _get_params('arg', @_);
+sub _get_params
+{
+	shift;
+	my $default = shift;
+
+	if(ref($_[0]) eq 'HASH') {
+		# %rc = %{$_[0]};
+		return $_[0];
+	}
+
+	my %rc;
+
+	if((scalar(@_) % 2) == 0) {
+		%rc = @_;
+	} elsif(scalar(@_) == 1) {
+		if(defined($default)) {
+			$rc{$default} = shift;
+		} else {
+			my @c = caller(1);
+			my $func = $c[3];	# calling function name
+			Carp::croak('Usage: ', __PACKAGE__, "->$func()");
+		}
+	} elsif((scalar(@_) == 0) && defined($default)) {
+		my @c = caller(1);
+		my $func = $c[3];	# calling function name
+		Carp::croak('Usage: ', __PACKAGE__, "->$func($default => " . '$val)');
+	}
+
+	return \%rc;
 }
 
 =head1 AUTHOR
