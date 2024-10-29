@@ -20,11 +20,11 @@ Version 0.04
 our $VERSION = '0.04';
 
 use overload (
-        # '==' => \&equal,
-        # '!=' => \&not_equal,
-        '""' => \&as_string,
-        bool => sub { 1 },
-        fallback => 1   # So that boolean tests don't cause as_string to be called
+	# '==' => \&equal,
+	# '!=' => \&not_equal,
+	'""' => \&as_string,
+	bool => sub { 1 },
+	fallback => 1   # So that boolean tests don't cause as_string to be called
 );
 
 =head1 SYNOPSIS
@@ -105,22 +105,18 @@ Autoload will do this for you as
 
 =cut
 
-sub set {
+sub set
+{
 	my $self = shift;
 	my $params = $self->_get_params('string', @_);
 
-	my $lang = $params->{'lang'};
-
+	my $lang = $params->{'lang'} || $self->_get_language();
 	if(!defined($lang)) {
-		$lang = $self->_get_language();
-		if(!defined($lang)) {
-			Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
-			return;
-		}
+		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+		return;
 	}
 
 	my $string = $params->{'string'};
-
 	if(!defined($string)) {
 		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
 		return;
@@ -133,7 +129,8 @@ sub set {
 
 # https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
-sub _get_language {
+sub _get_language
+{
 	if($ENV{'LANGUAGE'}) {
 		if($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i) {
 			return lc($1);
@@ -147,9 +144,10 @@ sub _get_language {
 			return lc($1);
 		}
 	}
-	if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
-		return 'en';
-	}
+	# if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
+		# return 'en';
+	# }
+	return 'en' if defined $ENV{'LANG'} && $ENV{'LANG'} =~ /^C(\.|$)/;
 	return;	# undef
 }
 
