@@ -131,11 +131,10 @@ sub set
 # https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
 sub _get_language
 {
-	if($ENV{'LANGUAGE'}) {
-		if($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i) {
-			return lc($1);
-		}
+	if(($ENV{'LANGUAGE'}) && ($ENV{'LANGUAGE'} =~ /^([a-z]{2})/i)) {
+		return lc($1);
 	}
+
 	foreach my $variable('LC_ALL', 'LC_MESSAGES', 'LANG') {
 		my $val = $ENV{$variable};
 		next unless(defined($val));
@@ -144,6 +143,7 @@ sub _get_language
 			return lc($1);
 		}
 	}
+
 	# if(defined($ENV{'LANG'}) && (($ENV{'LANG'} =~ /^C\./) || ($ENV{'LANG'} eq 'C'))) {
 		# return 'en';
 	# }
@@ -178,13 +178,11 @@ sub as_string {
 	} else {
 		$params{'lang'} = shift;
 	}
-	my $lang = $params{'lang'} || $self->_get_language();
 
-	if(!defined($lang)) {
-		Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
-		return;
+	if(my $lang = ($params{'lang'} || $self->_get_language())) {
+		return $self->{'strings'}->{$lang};
 	}
-	return $self->{'strings'}->{$lang};
+	Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
 }
 
 =head2 encode
