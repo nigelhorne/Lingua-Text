@@ -2,8 +2,10 @@ package Lingua::String;
 
 use strict;
 use warnings;
+
 use Carp;
 use HTML::Entities;
+use Scalar::Util;
 
 # TODO: Investigate Locale::Maketext
 
@@ -66,6 +68,7 @@ sub new {
 	my $class = shift;
 	my %args;
 
+	# Handle hash or hashref arguments
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
@@ -81,15 +84,19 @@ sub new {
 		# Using Lingua::String->new(), not Lingua::String::new()
 		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 		# return;
+
+		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
-	} elsif(ref($class)) {
-		# clone the given object
+	} elsif(Scalar::Util::blessed($class)) {
+		# If $class is an object, clone it with new arguments
 		return bless { %{$class}, %args }, ref($class);
 	}
 
+	# Return the blessed object
 	if(scalar(%args)) {
 		return bless { strings => \%args }, $class;
 	}
+
 	return bless { }, $class;
 }
 
@@ -209,7 +216,7 @@ sub encode {
 sub AUTOLOAD
 {
 	our $AUTOLOAD;
-	my $self = shift;
+	my $self = shift or return;
 
 	# Extract the key name from the AUTOLOAD variable
 	my ($key) = $AUTOLOAD =~ /::(\w+)$/;

@@ -33,7 +33,8 @@ WriteMakefile(
 	}, PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,
-		'HTML::Entities' => 0
+		'HTML::Entities' => 0,
+		'Scalar::Util' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'Lingua-String-*' },
 	# META_ADD => {
