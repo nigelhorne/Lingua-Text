@@ -255,12 +255,12 @@ sub _get_params
 	if(($num_args == 1) && (defined $default)) {
 		# %rc = ($default => shift);
 		return { $default => shift };
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	} elsif($num_args == 0 && defined $default) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args % 2) == 0) {
+		%rc = @_;
 	}
 
 	return \%rc;
