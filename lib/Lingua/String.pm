@@ -176,9 +176,7 @@ sub as_string {
 
 	if(ref($_[0]) eq 'HASH') {
 		%params = %{$_[0]};
-	} elsif(scalar(@_) == 0) {
-		# $params{'lang'} = $self->_get_language();
-	} elsif(scalar(@_) % 2 == 0) {
+	} elsif((scalar(@_) % 2) == 0) {
 		if(defined($_[0])) {
 			%params = @_;
 		}
@@ -207,7 +205,7 @@ sub encode {
 	my $self = shift;
 
 	while(my($k, $v) = each(%{$self->{'strings'}})) {
-		utf8::decode($v);
+		utf8::decode($v) unless utf8::is_utf8($v);  # Only decode if not already UTF-8
 		$self->{'strings'}->{$k} = HTML::Entities::encode_entities($v);
 	}
 	return $self;
