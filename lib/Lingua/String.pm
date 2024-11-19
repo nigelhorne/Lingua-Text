@@ -89,7 +89,10 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		if(scalar(%args)) {
+			return bless { strings => {%{$class->{'strings'}}, %args} }, ref($class);
+		}
+		return bless { %{$class} }, ref($class);
 	}
 
 	# Return the blessed object
