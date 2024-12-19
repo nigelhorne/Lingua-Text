@@ -66,10 +66,10 @@ Create a Lingua::String object.
 
 sub new {
 	my $class = shift;
-	my %args;
 
 	# Handle hash or hashref arguments
-	if(ref($_[0]) eq 'HASH') {
+	my %args;
+	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
 		%args = %{$_[0]};
 	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
 		%args = ($lang => $_[0]);
@@ -81,9 +81,11 @@ sub new {
 	}
 
 	if(!defined($class)) {
-		# Using Lingua::String->new(), not Lingua::String::new()
-		# carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-		# return;
+		if((scalar keys %args) > 0) {
+			# Using Lingua::String->new(), not Lingua::String::new()
+			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
+			return;
+		}
 
 		# FIXME: this only works when no arguments are given
 		$class = __PACKAGE__;
@@ -262,6 +264,10 @@ sub _get_params
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
+	} elsif($num_args == 0) {
+		return;
+	} else {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
 	}
 
 	return \%rc;
