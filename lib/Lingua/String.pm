@@ -62,6 +62,10 @@ Create a Lingua::String object.
 
     my $str = Lingua::String->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
+Accepts various input formats, e.g. HASH or reference to a HASH.
+Clones existing objects with or without modifications.
+Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
+
 =cut
 
 sub new {

@@ -8,6 +8,12 @@ BEGIN {
 	use_ok('Lingua::String')
 }
 
+local %ENV;
+
+delete $ENV{'LANGUAGE'};
+delete $ENV{'LC_ALL'};
+delete $ENV{'LANG'};
+
 # Test object creation
 my $string = Lingua::String->new({ en => 'Hello', fr => 'Bonjour' });
 isa_ok($string, 'Lingua::String', 'Object created');
