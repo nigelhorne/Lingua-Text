@@ -243,7 +243,8 @@ sub AUTOLOAD
 	return $self->{'strings'}->{$key};
 }
 
-# Helper routine to parse the arguments given to a function,
+# Helper routine to parse the arguments given to a function.
+# Processes arguments passed to methods and ensures they are in a usable format,
 #	allowing the caller to call the function in anyway that they want
 #	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
 #	when called _get_params('arg', @_);
@@ -253,7 +254,7 @@ sub _get_params
 	my $default = shift;
 
 	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if ref $_[0] eq 'HASH';
+	return $_[0] if(ref($_[0]) eq 'HASH');
 
 	my %rc;
 	my $num_args = scalar @_;
@@ -264,8 +265,8 @@ sub _get_params
 		return { $default => shift };
 	} elsif($num_args == 1) {
 		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif($num_args == 0 && defined $default) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '($default => \$val)');
+	} elsif(($num_args == 0) && (defined($default))) {
+		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
 	} elsif(($num_args % 2) == 0) {
 		%rc = @_;
 	} elsif($num_args == 0) {
@@ -322,7 +323,7 @@ L<http://deps.cpantesters.org/?module=Lingua-String>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021-2024 Nigel Horne.
+Copyright 2021-2025 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
