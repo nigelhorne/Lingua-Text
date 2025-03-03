@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use HTML::Entities;
+use Params::Get;
 use Scalar::Util;
 
 # TODO: Investigate Locale::Maketext
@@ -124,7 +125,7 @@ Autoload will do this for you as
 sub set
 {
 	my $self = shift;
-	my $params = $self->_get_params('string', @_);
+	my $params = Params::Get::get_params('string', @_);
 
 	my $lang = $params->{'lang'} || $self->_get_language();
 	if(!defined($lang)) {
@@ -241,41 +242,6 @@ sub AUTOLOAD
 
 	# Get the requested language ($key)
 	return $self->{'strings'}->{$key};
-}
-
-# Helper routine to parse the arguments given to a function.
-# Processes arguments passed to methods and ensures they are in a usable format,
-#	allowing the caller to call the function in anyway that they want
-#	e.g. foo('bar'), foo(arg => 'bar'), foo({ arg => 'bar' }) all mean the same
-#	when called _get_params('arg', @_);
-sub _get_params
-{
-	shift;  # Discard the first argument (typically $self)
-	my $default = shift;
-
-	# Directly return hash reference if the first parameter is a hash reference
-	return $_[0] if(ref($_[0]) eq 'HASH');
-
-	my %rc;
-	my $num_args = scalar @_;
-
-	# Populate %rc based on the number and type of arguments
-	if(($num_args == 1) && (defined $default)) {
-		# %rc = ($default => shift);
-		return { $default => shift };
-	} elsif($num_args == 1) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	} elsif(($num_args == 0) && (defined($default))) {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-	} elsif(($num_args % 2) == 0) {
-		%rc = @_;
-	} elsif($num_args == 0) {
-		return;
-	} else {
-		Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], '()');
-	}
-
-	return \%rc;
 }
 
 =head1 AUTHOR
