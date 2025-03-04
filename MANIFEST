@@ -21,6 +21,7 @@ t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/port.t
 t/strict.t
 t/string.t
 t/vars.t
