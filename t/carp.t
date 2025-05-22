@@ -29,5 +29,5 @@ CARP: {
 
 	$ENV{'LANGUAGE'} = 'en_GB';
 
-	does_carp_that_matches(sub { $str = Lingua::String->new('one', 'two', 'three') }, qr/usage/);
+	does_croak_that_matches(sub { $str = Lingua::String->new('one', 'two', 'three') }, qr/Usage/);
 }

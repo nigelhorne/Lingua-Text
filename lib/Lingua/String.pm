@@ -74,15 +74,10 @@ sub new {
 
 	# Handle hash or hashref arguments
 	my %args;
-	if((@_ == 1) && (ref $_[0] eq 'HASH')) {
-		%args = %{$_[0]};
-	} elsif((scalar(@_) == 1) && (my $lang = _get_language())) {
-		%args = ($lang => $_[0]);
-	} elsif((scalar(@_) % 2) == 0) {
-		%args = @_;
-	} else {
-		Carp::carp(__PACKAGE__, ': usage: new(%args)');
-		return;
+	if((scalar(@_) == 1) && (!ref($_[0])) && (my $lang = _get_language())) {
+		$args{$lang} = $_[0];
+	} elsif(my $params = Params::Get::get_params(undef, @_)) {
+		%args = %{$params};
 	}
 
 	if(!defined($class)) {
