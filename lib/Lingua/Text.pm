@@ -16,11 +16,11 @@ Lingua::Text - Class to contain text many different languages
 
 =head1 VERSION
 
-Version 0.06
+Version 0.07
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use overload (
 	# '==' => \&equal,

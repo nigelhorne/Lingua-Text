@@ -1,19 +1,19 @@
 # NAME
 
-Lingua::String - Class to contain a string in many different languages
+Lingua::Text - Class to contain text many different languages
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
-Hold many strings in one object,
+Hold many texts in one object,
 thereby encapsulating internationalized text.
 
-    use Lingua::String;
+    use Lingua::Text;
 
-    my $str = Lingua::String->new();
+    my $str = Lingua::Text->new();
 
     $str->fr('Bonjour Tout le Monde');
     $str->en('Hello, World');
@@ -25,17 +25,17 @@ thereby encapsulating internationalized text.
     $ENV{'LANG'} = 'de_DE';
     print "$str\n";     # Prints nothing
 
-    my $string = Lingua::String->new('hello');  # Initialises the 'current' language
+    my $text = Lingua::Text->new('hello');      # Initialises the 'current' language
 
 # METHODS
 
 ## new
 
-Create a Lingua::String object.
+Create a Lingua::Text object.
 
-    use Lingua::String;
+    use Lingua::Text;
 
-    my $str = Lingua::String->new({ 'en' => 'Here', 'fr' => 'Ici' });
+    my $str = Lingua::Text->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
 Accepts various input formats, e.g. HASH or reference to a HASH.
 Clones existing objects with or without modifications.
@@ -43,9 +43,9 @@ Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
 ## set
 
-Sets a string in a language.
+Sets a text in a language.
 
-    $str->set({ string => 'House', lang => 'en' });
+    $str->set({ text => 'House', lang => 'en' });
 
 Autoload will do this for you as
 
@@ -53,24 +53,24 @@ Autoload will do this for you as
 
 ## as\_string
 
-Returns the string in the language requested in the parameter.
+Returns the text in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
-    my $string = Lingua::String->new(en => 'boat', fr => 'bateau');
-    print $string->as_string(), "\n";
-    print $string->as_string('fr'), "\n";
-    print $string->as_string({ lang => 'en' }), "\n";
+    my $text = Lingua::Text->new(en => 'boat', fr => 'bateau');
+    print $text->as_string(), "\n";
+    print $text->as_string('fr'), "\n";
+    print $text->as_string({ lang => 'en' }), "\n";
 
 ## encode
 
-Turns the encapsulated strings into HTML entities
+Turns the encapsulated texts into HTML entities
 
-    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode();
-    print $string->fr(), "\n";  # Prints &eacute;tude
+    my $text = Lingua::Text->new(en => 'study', fr => 'étude')->encode();
+    print $text->fr(), "\n";    # Prints &eacute;tude
 
 # AUTHOR
 
-Nigel Horne, `<njh at bandsman.co.uk>`
+Nigel Horne, `<njh at nigelhorne.com>`
 
 # BUGS
 
@@ -81,31 +81,33 @@ double encoding.
 
 # SUPPORT
 
+This module is provided as-is without any warranty.
+
 You can find documentation for this module with the perldoc command.
 
-    perldoc Lingua::String
+    perldoc Lingua::Text
 
 You can also look for information at:
 
 - MetaCPAN
 
-    [https://metacpan.org/release/Lingua-String](https://metacpan.org/release/Lingua-String)
+    [https://metacpan.org/release/Lingua-Text](https://metacpan.org/release/Lingua-Text)
 
 - RT: CPAN's request tracker
 
-    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-String](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-String)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text)
 
 - CPANTS
 
-    [http://cpants.cpanauthors.org/dist/Lingua-String](http://cpants.cpanauthors.org/dist/Lingua-String)
+    [http://cpants.cpanauthors.org/dist/Lingua-Text](http://cpants.cpanauthors.org/dist/Lingua-Text)
 
 - CPAN Testers' Matrix
 
-    [http://matrix.cpantesters.org/?dist=Lingua-String](http://matrix.cpantesters.org/?dist=Lingua-String)
+    [http://matrix.cpantesters.org/?dist=Lingua-Text](http://matrix.cpantesters.org/?dist=Lingua-Text)
 
 - CPAN Testers Dependencies
 
-    [http://deps.cpantesters.org/?module=Lingua-String](http://deps.cpantesters.org/?module=Lingua-String)
+    [http://deps.cpantesters.org/?module=Lingua-Text](http://deps.cpantesters.org/?module=Lingua-Text)
 
 # LICENCE AND COPYRIGHT
 
