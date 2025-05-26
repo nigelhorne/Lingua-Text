@@ -25,9 +25,9 @@ our $VERSION = '0.06';
 use overload (
 	# '==' => \&equal,
 	# '!=' => \&not_equal,
-	'""' => \&as_text,
+	'""' => \&as_string,
 	bool => sub { 1 },
-	fallback => 1   # So that boolean tests don't cause as_text to be called
+	fallback => 1   # So that boolean tests don't cause as_string to be called
 );
 
 =head1 SYNOPSIS
@@ -163,19 +163,19 @@ sub _get_language
 	return;	# undef
 }
 
-=head2 as_text
+=head2 as_string
 
 Returns the text in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
     my $text = Lingua::Text->new(en => 'boat', fr => 'bateau');
-    print $text->as_text(), "\n";
-    print $text->as_text('fr'), "\n";
-    print $text->as_text({ lang => 'en' }), "\n";
+    print $text->as_string(), "\n";
+    print $text->as_string('fr'), "\n";
+    print $text->as_string({ lang => 'en' }), "\n";
 
 =cut
 
-sub as_text {
+sub as_string {
 	my $self = shift;
 	my %params;
 
@@ -192,7 +192,7 @@ sub as_text {
 	if(my $lang = ($params{'lang'} || $self->_get_language())) {
 		return $self->{'texts'}->{$lang};
 	}
-	Carp::carp(__PACKAGE__, ': usage: as_text(lang => $language)');
+	Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
 }
 
 =head2 encode

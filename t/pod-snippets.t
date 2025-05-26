@@ -7,7 +7,7 @@ use Test::DescribeMe qw(author);
 use Test::Most;
 use Test::Needs 'Test::Pod::Snippets';
 
-my @modules = qw/ Lingua::String /;
+my @modules = qw/ Lingua::Text /;
 Test::Pod::Snippets->import();
 Test::Pod::Snippets->new()->runtest(module => $_, testgroup => 1) for @modules;
 

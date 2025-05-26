@@ -5,7 +5,7 @@ use warnings;
 use Test::Most tests => 14;
 
 BEGIN {
-	use_ok('Lingua::String')
+	use_ok('Lingua::Text')
 }
 
 local %ENV;
@@ -15,8 +15,8 @@ delete $ENV{'LC_ALL'};
 delete $ENV{'LANG'};
 
 # Test object creation
-my $string = Lingua::String->new({ en => 'Hello', fr => 'Bonjour' });
-isa_ok($string, 'Lingua::String', 'Object created');
+my $string = Lingua::Text->new({ en => 'Hello', fr => 'Bonjour' });
+isa_ok($string, 'Lingua::Text', 'Object created');
 
 # Test setting and getting strings
 $string->en('Hello, World');
@@ -41,12 +41,12 @@ $string->encode();
 is($string->fr(), 'Bonjour, Tout le Monde, caf&eacute;', 'Encode retains correct French with HTML entities');
 
 # Test set method
-$string->set({ string => 'Hola', lang => 'es' });
+$string->set({ text => 'Hola', lang => 'es' });
 is($string->es(), 'Hola', 'Set and get Spanish string');
 
 # Test cloning
 my $cloned_string = $string->new({ de => 'Hallo' });
-isa_ok($cloned_string, 'Lingua::String', 'Cloned object created');
+isa_ok($cloned_string, 'Lingua::Text', 'Cloned object created');
 is($cloned_string->de(), 'Hallo', 'Cloned object contains new language');
 is($cloned_string->es(), 'Hola', 'Cloned object retains old language');
 

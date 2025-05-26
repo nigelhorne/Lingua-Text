@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 use Test::Most tests => 3;
-use Lingua::String;
+use Lingua::Text;
 
-isa_ok(Lingua::String->new(), 'Lingua::String', 'Creating Lingua::String object');
-isa_ok(Lingua::String->new()->new(), 'Lingua::String', 'Cloning Lingua::String object');
-isa_ok(Lingua::String::new(), 'Lingua::String', 'Creating Lingua::String object');
+isa_ok(Lingua::Text->new(), 'Lingua::Text', 'Creating Lingua::Text object');
+isa_ok(Lingua::Text->new()->new(), 'Lingua::Text', 'Cloning Lingua::Text object');
+isa_ok(Lingua::Text::new(), 'Lingua::Text', 'Creating Lingua::Text object');

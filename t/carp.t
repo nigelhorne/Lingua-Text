@@ -6,11 +6,11 @@ use Test::Carp;
 use Test::Most tests => 9;
 
 BEGIN {
-	use_ok('Lingua::String');
+	use_ok('Lingua::Text');
 }
 
 CARP: {
-	my $str = new_ok('Lingua::String');
+	my $str = new_ok('Lingua::Text');
 
 	does_croak_that_matches(sub { $str->set() }, qr/Usage/);
 	does_carp_that_matches(sub { $str->set('lang' => 'foo') }, qr/usage/);
@@ -21,7 +21,7 @@ CARP: {
 	delete $ENV{'LANG'};
 	$ENV{'LANGUAGE'} = 'x';	# Invalid locale
 
-	$str = new_ok('Lingua::String' => [ \('en' => 'and', 'fr' => 'et', 'de' => 'und') ]);
+	$str = new_ok('Lingua::Text' => [ \('en' => 'and', 'fr' => 'et', 'de' => 'und') ]);
 
 	does_carp_that_matches(sub { $str->as_string() }, qr/usage/);
 
@@ -29,5 +29,5 @@ CARP: {
 
 	$ENV{'LANGUAGE'} = 'en_GB';
 
-	does_croak_that_matches(sub { $str = Lingua::String->new('one', 'two', 'three') }, qr/Usage/);
+	does_croak_that_matches(sub { $str = Lingua::Text->new('one', 'two', 'three') }, qr/Usage/);
 }
