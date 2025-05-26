@@ -12,10 +12,10 @@ if($^O eq 'darwin') {
 }
 
 WriteMakefile(
-	NAME		=> 'Lingua::String',
-	AUTHOR		=> q{Nigel Horne <njh@bandsman.co.uk>},
-	VERSION_FROM	=> 'lib/Lingua/String.pm',
-	ABSTRACT_FROM	 => 'lib/Lingua/String.pm',
+	NAME		=> 'Lingua::Text',
+	AUTHOR		=> q{Nigel Horne <njh@nigelhorne.com>},
+	VERSION_FROM	=> 'lib/Lingua/Text.pm',
+	ABSTRACT_FROM	 => 'lib/Lingua/Text.pm',
 	((defined($ExtUtils::MakeMaker::VERSION) &&
 	 ($ExtUtils::MakeMaker::VERSION >= 6.3002))
 	  ? ('LICENSE'=> 'GPL')
@@ -38,7 +38,7 @@ WriteMakefile(
 		'Params::Get' => 0,
 		'Scalar::Util' => 0
 	}, dist => $dist,
-	clean		=> { FILES => 'Lingua-String-*' },
+	clean		=> { FILES => 'Lingua-Text-*' },
 	# META_ADD => {
 		# provides => {}
 	# },
@@ -47,14 +47,14 @@ WriteMakefile(
 		resources => {
 			repository => {
 				type => 'git',
-				url => 'git://github.com/nigelhorne/Lingua-String.git',
-				web => 'https://github.com/nigelhorne/Lingua-String',
-				repository => 'https://github.com/nigelhorne/Lingua-String',
+				url => 'git://github.com/nigelhorne/Lingua-Text.git',
+				web => 'https://github.com/nigelhorne/Lingua-Text',
+				repository => 'https://github.com/nigelhorne/Lingua-Text',
 			}, bugtracker => {
-				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-String',
-				web => 'https://github.com/nigelhorne/Lingua-String/issues',
-				url => 'https://github.com/nigelhorne/Lingua-String/issues',
-				mailto => 'bug-Lingua-String@rt.cpan.org'
+				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Lingua-Text',
+				web => 'https://github.com/nigelhorne/Lingua-Text/issues',
+				url => 'https://github.com/nigelhorne/Lingua-Text/issues',
+				mailto => 'bug-Lingua-Text@rt.cpan.org'
 			}
 		},
 	},

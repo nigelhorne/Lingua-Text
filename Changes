@@ -1,5 +1,8 @@
-Revision history for Lingua-String
+Revision history for Lingua-Text
 
+0.07
+	Renamed as Lingua::Text to be compatible with Data::Text
+	
 0.06	Mon Mar  3 15:52:19 EST 2025
 	Only decode if not already UTF-8
 	Added t/30-basics.t

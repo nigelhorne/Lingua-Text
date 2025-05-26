@@ -1,4 +1,4 @@
-package Lingua::String;
+package Lingua::Text;
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use Scalar::Util;
 
 =head1 NAME
 
-Lingua::String - Class to contain a string in many different languages
+Lingua::Text - Class to contain text many different languages
 
 =head1 VERSION
 
@@ -25,19 +25,19 @@ our $VERSION = '0.06';
 use overload (
 	# '==' => \&equal,
 	# '!=' => \&not_equal,
-	'""' => \&as_string,
+	'""' => \&as_text,
 	bool => sub { 1 },
-	fallback => 1   # So that boolean tests don't cause as_string to be called
+	fallback => 1   # So that boolean tests don't cause as_text to be called
 );
 
 =head1 SYNOPSIS
 
-Hold many strings in one object,
+Hold many texts in one object,
 thereby encapsulating internationalized text.
 
-    use Lingua::String;
+    use Lingua::Text;
 
-    my $str = Lingua::String->new();
+    my $str = Lingua::Text->new();
 
     $str->fr('Bonjour Tout le Monde');
     $str->en('Hello, World');
@@ -49,7 +49,7 @@ thereby encapsulating internationalized text.
     $ENV{'LANG'} = 'de_DE';
     print "$str\n";	# Prints nothing
 
-    my $string = Lingua::String->new('hello');	# Initialises the 'current' language
+    my $text = Lingua::Text->new('hello');	# Initialises the 'current' language
 
 =cut
 
@@ -57,11 +57,11 @@ thereby encapsulating internationalized text.
 
 =head2 new
 
-Create a Lingua::String object.
+Create a Lingua::Text object.
 
-    use Lingua::String;
+    use Lingua::Text;
 
-    my $str = Lingua::String->new({ 'en' => 'Here', 'fr' => 'Ici' });
+    my $str = Lingua::Text->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
 Accepts various input formats, e.g. HASH or reference to a HASH.
 Clones existing objects with or without modifications.
@@ -82,7 +82,7 @@ sub new {
 
 	if(!defined($class)) {
 		if((scalar keys %args) > 0) {
-			# Using Lingua::String->new(), not Lingua::String::new()
+			# Using Lingua::Text->new(), not Lingua::Text::new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
 		}
@@ -92,14 +92,14 @@ sub new {
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		if(scalar(%args)) {
-			return bless { strings => {%{$class->{'strings'}}, %args} }, ref($class);
+			return bless { texts => {%{$class->{'texts'}}, %args} }, ref($class);
 		}
 		return bless { %{$class} }, ref($class);
 	}
 
 	# Return the blessed object
 	if(scalar(%args)) {
-		return bless { strings => \%args }, $class;
+		return bless { texts => \%args }, $class;
 	}
 
 	return bless { }, $class;
@@ -107,9 +107,9 @@ sub new {
 
 =head2 set
 
-Sets a string in a language.
+Sets a text in a language.
 
-    $str->set({ string => 'House', lang => 'en' });
+    $str->set({ text => 'House', lang => 'en' });
 
 Autoload will do this for you as
 
@@ -120,21 +120,21 @@ Autoload will do this for you as
 sub set
 {
 	my $self = shift;
-	my $params = Params::Get::get_params('string', @_);
+	my $params = Params::Get::get_params('text', @_);
 
 	my $lang = $params->{'lang'} || $self->_get_language();
 	if(!defined($lang)) {
-		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+		Carp::carp(__PACKAGE__, ': usage: set(text => text, lang => $language)');
 		return;
 	}
 
-	my $string = $params->{'string'};
-	if(!defined($string)) {
-		Carp::carp(__PACKAGE__, ': usage: set(string => string, lang => $language)');
+	my $text = $params->{'text'};
+	if(!defined($text)) {
+		Carp::carp(__PACKAGE__, ': usage: set(text => text, lang => $language)');
 		return;
 	}
 
-	$self->{'strings'}->{$lang} = $string;
+	$self->{'texts'}->{$lang} = $text;
 
 	return $self;
 }
@@ -163,19 +163,19 @@ sub _get_language
 	return;	# undef
 }
 
-=head2 as_string
+=head2 as_text
 
-Returns the string in the language requested in the parameter.
+Returns the text in the language requested in the parameter.
 If that parameter is not given, the system language is used.
 
-    my $string = Lingua::String->new(en => 'boat', fr => 'bateau');
-    print $string->as_string(), "\n";
-    print $string->as_string('fr'), "\n";
-    print $string->as_string({ lang => 'en' }), "\n";
+    my $text = Lingua::Text->new(en => 'boat', fr => 'bateau');
+    print $text->as_text(), "\n";
+    print $text->as_text('fr'), "\n";
+    print $text->as_text({ lang => 'en' }), "\n";
 
 =cut
 
-sub as_string {
+sub as_text {
 	my $self = shift;
 	my %params;
 
@@ -190,28 +190,28 @@ sub as_string {
 	}
 
 	if(my $lang = ($params{'lang'} || $self->_get_language())) {
-		return $self->{'strings'}->{$lang};
+		return $self->{'texts'}->{$lang};
 	}
-	Carp::carp(__PACKAGE__, ': usage: as_string(lang => $language)');
+	Carp::carp(__PACKAGE__, ': usage: as_text(lang => $language)');
 }
 
 =head2 encode
 
 =encoding utf-8
 
-Turns the encapsulated strings into HTML entities
+Turns the encapsulated texts into HTML entities
 
-    my $string = Lingua::String->new(en => 'study', fr => 'étude')->encode();
-    print $string->fr(), "\n";	# Prints &eacute;tude
+    my $text = Lingua::Text->new(en => 'study', fr => 'étude')->encode();
+    print $text->fr(), "\n";	# Prints &eacute;tude
 
 =cut
 
 sub encode {
 	my $self = shift;
 
-	while(my($k, $v) = each(%{$self->{'strings'}})) {
+	while(my($k, $v) = each(%{$self->{'texts'}})) {
 		utf8::decode($v) unless utf8::is_utf8($v);  # Only decode if not already UTF-8
-		$self->{'strings'}->{$k} = HTML::Entities::encode_entities($v);
+		$self->{'texts'}->{$k} = HTML::Entities::encode_entities($v);
 	}
 	return $self;
 }
@@ -231,17 +231,17 @@ sub AUTOLOAD
 	return unless ref($self) eq __PACKAGE__;
 
 	if(my $value = shift) {
-		# Set the requested language ($key) to the given string ($value)
-		$self->{'strings'}->{$key} = $value;
+		# Set the requested language ($key) to the given text ($value)
+		$self->{'texts'}->{$key} = $value;
 	}
 
 	# Get the requested language ($key)
-	return $self->{'strings'}->{$key};
+	return $self->{'texts'}->{$key};
 }
 
 =head1 AUTHOR
 
-Nigel Horne, C<< <njh at bandsman.co.uk> >>
+Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
@@ -252,9 +252,11 @@ double encoding.
 
 =head1 SUPPORT
 
+This module is provided as-is without any warranty.
+
 You can find documentation for this module with the perldoc command.
 
-    perldoc Lingua::String
+    perldoc Lingua::Text
 
 You can also look for information at:
 
@@ -262,23 +264,23 @@ You can also look for information at:
 
 =item * MetaCPAN
 
-L<https://metacpan.org/release/Lingua-String>
+L<https://metacpan.org/release/Lingua-Text>
 
 =item * RT: CPAN's request tracker
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-String>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text>
 
 =item * CPANTS
 
-L<http://cpants.cpanauthors.org/dist/Lingua-String>
+L<http://cpants.cpanauthors.org/dist/Lingua-Text>
 
 =item * CPAN Testers' Matrix
 
-L<http://matrix.cpantesters.org/?dist=Lingua-String>
+L<http://matrix.cpantesters.org/?dist=Lingua-Text>
 
 =item * CPAN Testers Dependencies
 
-L<http://deps.cpantesters.org/?module=Lingua-String>
+L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 =back
 
