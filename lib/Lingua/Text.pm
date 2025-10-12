@@ -63,7 +63,7 @@ Create a Lingua::Text object.
 
     my $str = Lingua::Text->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
-Accepts various input formats, e.g. HASH or reference to a HASH.
+Accepts various input formats, e.g., HASH or reference to a HASH.
 Clones existing objects with or without modifications.
 Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
@@ -230,6 +230,8 @@ sub AUTOLOAD
 	# Ensure the key is called on the correct package object
 	return unless ref($self) eq __PACKAGE__;
 
+	return unless _is_valid_language($key);
+
 	if(my $value = shift) {
 		# Set the requested language ($key) to the given text ($value)
 		$self->{'texts'}->{$key} = $value;
@@ -237,6 +239,12 @@ sub AUTOLOAD
 
 	# Get the requested language ($key)
 	return $self->{'texts'}->{$key};
+}
+
+# Language validation
+sub _is_valid_language {
+	my $lang = shift;
+	return $lang =~ /^[a-z]{2}(?:_[A-Z]{2})?$/;  # en or en_US format
 }
 
 =head1 AUTHOR

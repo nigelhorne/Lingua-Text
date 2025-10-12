@@ -1,5 +1,8 @@
 Revision history for Lingua-Text
 
+0.08
+	Validate the language in AUTOLOAD
+
 0.07	Mon May 26 09:48:59 EDT 2025
 	Renamed as Lingua::Text to be compatible with Data::Text
 	
