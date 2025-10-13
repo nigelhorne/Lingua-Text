@@ -152,7 +152,8 @@ sub _get_language
 		next unless(defined($val));
 
 		if($val =~ /^([a-z]{2})/i) {
-			return lc($1);
+			$val = lc($1);
+			return lc($val) if _is_valid_language($val);
 		}
 	}
 
