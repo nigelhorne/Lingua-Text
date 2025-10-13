@@ -230,6 +230,9 @@ sub AUTOLOAD
 	# Ensure the key is called on the correct package object
 	return unless ref($self) eq __PACKAGE__;
 
+	# Only allow 2-letter language codes
+	return unless $key =~ /^[a-z]{2}$/i;
+
 	return unless _is_valid_language($key);
 
 	if(my $value = shift) {
