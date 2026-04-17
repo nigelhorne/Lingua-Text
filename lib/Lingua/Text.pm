@@ -17,11 +17,11 @@ Lingua::Text - Class to contain text in many different languages
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use overload (
 	# '==' => \&equal,
@@ -304,7 +304,7 @@ L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright 2021-2025 Nigel Horne.
+Copyright 2021-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
