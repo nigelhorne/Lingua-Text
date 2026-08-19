@@ -465,7 +465,10 @@ subtest 'encode() P-EN0: empty texts -> loop skips, $self returned' => sub {
 	my $t = Lingua::Text->new();
 	my $ret = $t->encode();
 	is(ref($ret), 'Lingua::Text', 'P-EN0: encode() returns $self even on empty object');
-	is($ret, $t, 'P-EN0: same object returned (not a copy)');
+	# Compare refaddr rather than the objects directly: the "" overload returns
+	# undef when no locale is set, which generates an "uninitialized value"
+	# Perl warning if cmp_ok stringifies both sides.
+	is(refaddr($ret), refaddr($t), 'P-EN0: same object returned (not a copy)');
 	restore_all();
 };
 
@@ -530,10 +533,14 @@ subtest 'encode() P-EN3: ref value -> next (preserved as-is)' => sub {
 # ===========================================================================
 subtest 'encode() P-EN4: UTF-8 flagged string -> entity-encoded directly' => sub {
 	mock 'Object::Configure::configure' => sub { $_[1] };
-	my $t = Lingua::Text->new(fr => $ETUDE);
-	ok(utf8::is_utf8($t->fr()), 'P-EN4 setup: stored value has UTF-8 flag');
+	my $t = Lingua::Text->new();
+	# U+263A (SMILEY FACE) is above U+00FF so Perl must use the UTF-8 internal
+	# representation; utf8::is_utf8() will return true for this codepoint.
+	my $wide = "\x{263A}";
+	$t->{'texts'}{'fr'} = $wide;
+	ok(utf8::is_utf8($t->{'texts'}{'fr'}), 'P-EN4 setup: stored value has UTF-8 flag');
 	$t->encode();
-	is($t->fr(), $ETUDE_E, 'P-EN4: UTF-8 flagged string entity-encoded');
+	is($t->fr(), '&#x263A;', 'P-EN4: UTF-8 flagged string entity-encoded');
 	restore_all();
 };
 
