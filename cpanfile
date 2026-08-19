@@ -9,9 +9,7 @@ requires 'HTML::Entities';
 requires 'I18N::LangTags::Detect';
 requires 'Object::Configure';
 requires 'Params::Get';
-requires 'Readonly';
 requires 'Scalar::Util';
-requires 'Sub::Private';
 
 on 'test' => sub {
 	requires 'IPC::System::Simple';

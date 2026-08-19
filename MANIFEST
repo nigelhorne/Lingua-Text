@@ -10,11 +10,13 @@ t/00-load.t
 t/10-new.t
 t/30-basics.t
 t/carp.t
+t/cgi_security.t
 t/comment-spelling.t
 t/eof.t
 t/eol.t
 t/links.t
 t/locales.t
+t/logic.t
 t/manifest.t
 t/no404s.t
 t/pod-cm.t
