@@ -21,15 +21,15 @@ use Sub::Private;
 
 =head1 NAME
 
-Lingua::Text - Class to contain text in many different languages
+Lingua::Text - Store the same text in many languages; retrieve it in the user's language automatically
 
 =head1 VERSION
 
-Version 0.08
+Version 0.07
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.07';
 our $AUTOLOAD;
 
 # ---------------------------------------------------------------------------
@@ -128,18 +128,110 @@ sub _is_valid_language :Private {
 
 =head1 SYNOPSIS
 
+=head2 Basic use: store translations and print in the user's language
+
     use Lingua::Text;
 
-    my $str = Lingua::Text->new();
-    $str->fr('Bonjour Tout le Monde');
-    $str->en('Hello, World');
+    my $greeting = Lingua::Text->new(
+        en => 'Hello',
+        fr => 'Bonjour',
+        de => 'Hallo',
+    );
 
-    $ENV{'LANG'} = 'en_GB';
-    print "$str\n";     # Hello, World
-    $ENV{'LANG'} = 'fr_FR';
-    print "$str\n";     # Bonjour Tout le Monde
+    # The system locale (LANG, LC_MESSAGES, etc.) picks the language.
+    # No code change is needed when the user's OS language changes.
+    print $greeting, "\n";
 
-    my $text = Lingua::Text->new('hello');  # stores under the current locale
+=head2 Add translations after construction
+
+    my $label = Lingua::Text->new();
+    $label->en('Submit');
+    $label->fr('Envoyer');
+    $label->de('Abschicken');
+
+    # Ask for a specific language explicitly
+    print $label->as_string('fr'), "\n";   # Envoyer
+
+=head2 Build from a database hash
+
+    # Suppose the database returns: { en => 'Apple', fr => 'Pomme', de => 'Apfel' }
+    my $row  = $db->selectrow_hashref('SELECT en, fr, de FROM fruit WHERE id = ?', {}, $id);
+    my $name = Lingua::Text->new($row);
+    print $name;   # prints in the user's system language
+
+=head2 Add one translation to an existing object (clone)
+
+    my $base = Lingua::Text->new(en => 'colour', fr => 'couleur');
+    my $us   = $base->new(en => 'color');   # American English override
+
+    # $us  has en => 'color',  fr => 'couleur'
+    # $base is unchanged: en => 'colour', fr => 'couleur'
+
+=head2 Store text at runtime using a language variable
+
+    my $message = Lingua::Text->new();
+    my $user_lang = 'de';   # could come from a web request header
+
+    $message->set(text => 'Willkommen', lang => $user_lang);
+    print $message->as_string($user_lang), "\n";   # Willkommen
+
+=head2 Prepare multilingual text for HTML output
+
+    my $title = Lingua::Text->new(
+        en => 'read more',
+        fr => "lire la suite",
+    )->encode();   # converts accented characters to HTML entities
+
+    print "<title>$title</title>";   # safe for browsers in any locale
+
+=head1 DESCRIPTION
+
+Lingua::Text is a simple container that stores the same piece of text in
+multiple languages inside a single Perl object.  When you ask the object to
+print itself (or convert to a string), it automatically reads the user's
+operating-system language setting and returns the correct translation.
+
+=head2 How language detection works
+
+The module reads the following environment variables, in this order, and uses
+the first one it finds that contains a two-letter language code:
+
+=over 4
+
+=item 1. C<LANGUAGE> (space- or colon-separated preference list, e.g. C<fr:en>)
+
+=item 2. C<LC_ALL>
+
+=item 3. C<LC_MESSAGES>
+
+=item 4. C<LANG> (e.g. C<en_US.UTF-8> or C<de_DE>)
+
+=back
+
+Only the first two letters are used (e.g. C<en_GB.UTF-8> becomes C<en>), so
+you only need to store one translation per language, not per locale variant.
+
+If none of these variables is set, or if C<LANG> is set to the POSIX C<C>
+or C<C.UTF-8> locale, the module returns C<undef> (or C<'en'> for the C
+locale).
+
+=head2 How string interpolation works
+
+The object overloads Perl's C<""> (stringify) operator.  This means you can
+use a Lingua::Text object directly in strings:
+
+    print "Hello: $greeting\n";
+    my $html = "<h1>" . $title . "</h1>";
+
+You do B<not> need to call C<as_string()> yourself in most cases.
+
+=head2 Language code format
+
+Language codes follow ISO 639-1: two lower-case letters, e.g. C<en>, C<fr>,
+C<de>, C<es>, C<zh>.  An optional ISO 3166-1 country suffix may follow an
+underscore: C<en_US>, C<zh_CN>.  The module stores and retrieves by the
+two-letter code only; the country part of an environment variable is ignored
+during lookup.
 
 =head1 METHODS
 
@@ -147,58 +239,125 @@ sub _is_valid_language :Private {
 
 =head3 PURPOSE
 
-Construct a Lingua::Text object, optionally pre-populated with translations.
-Also supports cloning an existing object (with or without additional keys).
+Create a new Lingua::Text object.  The object starts empty, or pre-loaded
+with one or more translations you provide.
+
+Calling C<new()> on an B<existing> object creates an independent copy (a
+clone) with any extra translations you supply merged in.  The original object
+is never modified.
+
+=head3 ARGUMENTS
+
+You may pass arguments in any of the following forms:
+
+=over 4
+
+=item No arguments -- creates an empty object
+
+    my $t = Lingua::Text->new();
+
+=item Key/value pairs -- one pair per language
+
+    my $t = Lingua::Text->new(en => 'boat', fr => 'bateau');
+
+=item A hash reference
+
+    my $t = Lingua::Text->new({ en => 'boat', fr => 'bateau' });
+
+=item A single plain string -- stored under the current system locale language
+
+    # Only works if a locale environment variable is set.
+    # If no locale is set, the text is silently discarded.  See COMMON PITFALLS.
+    my $t = Lingua::Text->new('hello');
+
+=item An existing Lingua::Text object -- creates a clone
+
+    my $clone = $original->new();                      # exact copy
+    my $clone = $original->new(de => 'zusatz');        # copy + one more language
+
+=back
+
+=head3 RETURN VALUE
+
+Returns a blessed Lingua::Text reference on success.
+
+Returns C<undef> and emits a C<carp> warning when called as a plain function
+with arguments (e.g. C<Lingua::Text::new(en => 'hi')> without the arrow).
 
 =head3 EXAMPLE
 
-    # Empty object, add translations later
+    use Lingua::Text;
+
+    # Empty object
     my $t = Lingua::Text->new();
+    $t->en('Good morning');
+    $t->de('Guten Morgen');
 
-    # Inline key/value pairs
-    my $t = Lingua::Text->new(en => 'boat', fr => 'bateau');
+    # Pre-populated from a hash reference
+    my %translations = (en => 'cat', fr => 'chat', de => 'Katze');
+    my $animal = Lingua::Text->new(\%translations);
 
-    # Hash reference
-    my $t = Lingua::Text->new({ en => 'boat', fr => 'bateau' });
-
-    # Single scalar -- stored under the current locale language
-    my $t = Lingua::Text->new('hello');
-
-    # Clone with an extra translation
-    my $t2 = $t->new(de => 'Boot');
+    # Clone and override the English translation
+    my $us = $animal->new(en => 'kitty');
 
 =head3 API SPECIFICATION
 
 =head4 Input
 
-    args : HASH | HASHREF | SCALAR | Lingua::Text | ()
+    # Params::Validate::Strict-compatible schema
+    # (all parameters are optional; the whole argument list may be empty)
+
+    en   => { type => SCALAR, optional => 1 }   # and any other ISO 639-1 code
+    fr   => { type => SCALAR, optional => 1 }
+    ...  # one key per language
+
+    # OR a single HASHREF containing the same keys
+
+    # OR a single SCALAR (stored under the current locale language)
 
 =head4 Output
 
-    Returns a blessed Lingua::Text reference, or undef on misuse.
+    # Return::Set schema
+    on_success => Lingua::Text,   # blessed reference
+    on_misuse  => undef           # with carp warning
 
 =head3 MESSAGES
 
-    "use ->new() not ::new() to instantiate"
-        Cause:   Called as a function with arguments (Lingua::Text::new(...)).
-        Fix:     Use Lingua::Text->new(...).
+=over 4
+
+=item C<"use -E<gt>new() not ::new() to instantiate">  [carp]
+
+You called C<Lingua::Text::new(...)> (double-colon, function style) with
+arguments.  Use C<Lingua::Text-E<gt>new(...)> (arrow, method style) instead.
+
+=back
 
 =head3 FORMAL SPECIFICATION
 
+    -- Type definitions
+    STRING == seq CHAR
+    LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
+
+    -- State: a partial function from language codes to strings
     ┌─ LinguaText ────────────────────────────────────────────
-    │ texts : LANG ↦ TEXT
+    │ texts : LANG ⇸ STRING
     └─────────────────────────────────────────────────────────
 
-    LANG ≙ { l : ℤ* | l matches /^[a-z]{2}(_[A-Z]{2})?$/ }
-    TEXT ≙ ℤ*   (any Perl string)
-
+    -- Construction: initialise texts from zero or more lang/string pairs
     ┌─ new ───────────────────────────────────────────────────
     │ ΔLinguaText
-    │ args?  : ℙ(LANG × TEXT) ∪ {∅}
-    │ obj!   : LinguaText
+    │ init? : LANG ⇸ STRING
     ├─────────────────────────────────────────────────────────
-    │ obj!.texts = args? ≠ ∅ ⟹ args?
-    │                         | ∅
+    │ texts' = init?
+    └─────────────────────────────────────────────────────────
+
+    -- Clone: merge the parent's texts with any new pairs (new pairs win)
+    ┌─ clone ─────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ parent? : LinguaText
+    │ extra?  : LANG ⇸ STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = parent?.texts ⊕ extra?
     └─────────────────────────────────────────────────────────
 
 =cut
@@ -247,47 +406,99 @@ sub new {
 
 =head3 PURPOSE
 
-Store a translation for a given language code.  Equivalent to calling the
-AUTOLOAD accessor (e.g. C<$t->en('Hello')>) but allows the language to be
-supplied at runtime.
+Store or replace a single translation.  Use this when the language code is
+held in a variable at runtime; if the language is fixed at coding time, the
+shorthand accessor (e.g. C<$t-E<gt>en('Hello')>) is simpler.
+
+=head3 ARGUMENTS
+
+    text  -- the translation string (required)
+    lang  -- two-letter language code (optional; defaults to the system locale)
+
+The arguments may be passed as a hash, a hash reference, or as a plain
+positional string (only C<text>; C<lang> then comes from the system locale).
+
+=head3 RETURN VALUE
+
+Returns the object itself (C<$self>) on success, so calls may be chained.
+Because the object stringifies to its current-locale translation, the return
+value often I<looks> like the text you just stored -- but it is the object,
+not the string.  See L</COMMON PITFALLS>.
+
+Returns C<undef> and emits a C<carp> warning when required arguments are
+missing or when no language can be determined.
 
 =head3 EXAMPLE
 
+    my $t = Lingua::Text->new();
+
+    # Hash-reference form
     $t->set({ text => 'House', lang => 'en' });
+
+    # Flat hash form
     $t->set(text => 'Maison', lang => 'fr');
-    $t->set('Haus');   # stores under the current locale language
+
+    # Positional: lang comes from the system locale
+    $t->set('Haus');   # stored under whatever language $ENV{LANG} says
+
+    # Method chaining (set() returns $self)
+    my $t = Lingua::Text->new()->set(text => 'Hello', lang => 'en')
+                                ->set(text => 'Hola',  lang => 'es');
+
+    # Store the language code from a variable
+    my $user_lang = 'de';
+    $t->set(text => 'Willkommen', lang => $user_lang);
 
 =head3 API SPECIFICATION
 
 =head4 Input
 
-    text : SCALAR           -- the translation string (required)
-    lang : LANG             -- ISO 639-1 language code (default: system locale)
+    # Params::Validate::Strict-compatible schema
+    text => {
+        type     => SCALAR,
+        required => 1,
+    },
+    lang => {
+        type     => SCALAR,
+        optional => 1,
+        default  => _get_language(),     # falls back to system locale
+        regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
+    }
 
 =head4 Output
 
-    Returns $self on success (chainable via the C<""> overload).
-    Returns undef and emits a carp warning on missing arguments.
+    # Return::Set schema
+    on_success          => $self,    # the same Lingua::Text object
+    on_no_args          => undef     # with croak (programmer error)
+    on_missing_lang     => undef     # with carp
+    on_missing_text     => undef     # with carp
 
 =head3 MESSAGES
 
-    "Usage: set(text => $text, lang => $language)"  [croak]
-        Cause:   Called with no arguments at all.
-        Fix:     Provide at minimum a text string.
+=over 4
 
-    "usage: set(text => $text, lang => $language)"  [carp]
-        Cause:   lang cannot be determined, or text is absent/undef.
-        Fix:     Pass lang explicitly or ensure the locale environment is set.
+=item C<"Usage: set(text =E<gt> $text, lang =E<gt> $language)">  [croak]
+
+C<set()> was called with no arguments at all.  Provide at least C<text>.
+
+=item C<"usage: set(text =E<gt> $text, lang =E<gt> $language)">  [carp]
+
+Either C<text> is missing/undef, or C<lang> is missing and no locale
+environment variable is set.  Pass C<lang> explicitly to resolve the latter.
+
+=back
 
 =head3 FORMAL SPECIFICATION
 
+    -- set: add or replace one translation; all others remain unchanged
     ┌─ set ───────────────────────────────────────────────────
     │ ΔLinguaText
-    │ text? : TEXT
     │ lang? : LANG
+    │ text? : STRING
     ├─────────────────────────────────────────────────────────
     │ texts' = texts ⊕ { lang? ↦ text? }
     └─────────────────────────────────────────────────────────
+    -- ⊕ denotes relational override: lang? wins over any existing entry
 
 =cut
 
@@ -312,47 +523,105 @@ sub set {
 
 =head3 PURPOSE
 
-Return the stored translation for a requested language, or for the system
-locale when no language is specified.  This method is also the target of the
-C<""> stringification overload, so objects interpolate naturally in strings.
+Return the stored translation for a given language, or for the system locale
+when no language is specified.
+
+This method is also invoked automatically whenever Perl needs to convert the
+object to a string -- for example inside C<print>, in string concatenation, or
+in a comparison like C<$t eq 'hello'>.  You rarely need to call it directly.
+
+=head3 ARGUMENTS
+
+    lang  -- two-letter language code (optional; defaults to the system locale)
+
+Accepted forms:
+
+    $t->as_string()                  # uses system locale
+    $t->as_string('fr')              # positional
+    $t->as_string(lang => 'fr')      # named
+    $t->as_string({ lang => 'fr' })  # hash reference
+    "$t"                             # stringification overload (uses system locale)
+
+=head3 RETURN VALUE
+
+=over 4
+
+=item Returns the translation string when the language is known and stored.
+
+=item Returns C<undef> -- B<without> a warning -- when the language is known
+but no translation exists for it.  This is the normal "not translated yet"
+case.
+
+=item Returns C<undef> -- B<with> a C<carp> warning -- when no language can
+be determined (no argument supplied I<and> no locale environment variable set).
+
+=back
 
 =head3 EXAMPLE
 
+    use Lingua::Text;
+
     my $t = Lingua::Text->new(en => 'boat', fr => 'bateau');
 
-    print $t->as_string(),             "\n";  # uses $ENV{LANG}
-    print $t->as_string('fr'),         "\n";  # bateau
-    print $t->as_string(lang => 'en'), "\n";  # boat
-    print $t->as_string({ lang => 'fr' }), "\n";  # bateau
-    print "$t\n";                             # uses $ENV{LANG}
+    # Explicit language
+    print $t->as_string('en'), "\n";              # boat
+    print $t->as_string(lang => 'fr'), "\n";      # bateau
+
+    # System locale (assume LANG=de_DE.UTF-8)
+    print $t->as_string(), "\n";                  # undef -- no German stored
+
+    # String interpolation (same as calling as_string() with no args)
+    $ENV{LANG} = 'en_US.UTF-8';
+    print "I see a $t.\n";                        # I see a boat.
+
+    # Checking for a missing translation
+    if(!defined($t->as_string('zh'))) {
+        print "No Chinese translation available.\n";
+    }
 
 =head3 API SPECIFICATION
 
 =head4 Input
 
-    lang : LANG | ()    -- language code (optional; default: system locale)
+    # Params::Validate::Strict-compatible schema
+    lang => {
+        type     => SCALAR,
+        optional => 1,
+        default  => _get_language(),
+        regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
+    }
 
 =head4 Output
 
-    Returns the translation string, undef if none is stored for that language,
-    or undef with a carp warning when no language can be determined at all.
+    # Return::Set schema
+    on_found         => SCALAR,    # the translation string
+    on_not_found     => undef,     # language is known; no translation stored
+    on_no_language   => undef      # with carp warning
 
 =head3 MESSAGES
 
-    "usage: as_string(lang => $language)"  [carp]
-        Cause:   No lang argument and locale environment variables are absent.
-        Fix:     Pass lang explicitly or set LANG/LC_MESSAGES.
+=over 4
+
+=item C<"usage: as_string(lang =E<gt> $language)">  [carp]
+
+No C<lang> was supplied and no locale environment variable (C<LANG>,
+C<LC_MESSAGES>, C<LC_ALL>, C<LANGUAGE>) is set.  Either pass the language
+explicitly or set the locale before calling.
+
+=back
 
 =head3 FORMAL SPECIFICATION
 
+    -- as_string: look up one translation; state is unchanged (Xi schema)
     ┌─ as_string ─────────────────────────────────────────────
     │ ΞLinguaText
-    │ lang? : LANG ∪ {undef}
-    │ result! : TEXT ∪ {undef}
+    │ lang?    : LANG ∪ { current_locale }
+    │ result!  : STRING ∪ { undef }
     ├─────────────────────────────────────────────────────────
-    │ lang? ∈ dom texts ⟹ result! = texts(lang?)
-    │ lang? ∉ dom texts ⟹ result! = undef
+    │ lang? ∈ dom texts  ⟹  result! = texts(lang?)
+    │ lang? ∉ dom texts  ⟹  result! = undef
     └─────────────────────────────────────────────────────────
+    -- The state schema Ξ means texts is not modified by this operation.
 
 =cut
 
@@ -379,16 +648,40 @@ sub as_string {
 
 =head3 PURPOSE
 
-HTML-entity-encode every stored translation in place.  Call once before
-emitting text into an HTML context.
+Convert every stored translation from raw Unicode text to HTML entities.
+Call this once on an object before embedding its text in HTML pages, to make
+accented characters and other special characters safe for all browsers.
 
-B<Note>: There is currently no C<decode()> counterpart; avoid double-encoding
-by calling C<encode()> only once on a freshly constructed object.
+For example, the French word C<"\x{E9}tude"> (e-acute followed by "tude")
+becomes C<"&eacute;tude"> after encoding.
+
+B<Important:> This method modifies the object I<in place> and B<cannot be
+undone>.  There is no C<decode()> counterpart.  See L</COMMON PITFALLS>.
+
+=head3 ARGUMENTS
+
+None.
+
+=head3 RETURN VALUE
+
+Returns the object itself (C<$self>), so C<encode()> can be chained directly
+onto C<new()>.
 
 =head3 EXAMPLE
 
-    my $t = Lingua::Text->new(en => 'study', fr => 'étude')->encode();
-    print $t->fr();    # h&eacute;tude
+    use Lingua::Text;
+
+    # Build an object and encode it in one step
+    my $t = Lingua::Text->new(
+        en => 'study',
+        fr => "\x{E9}tude",     # e with acute accent (Unicode codepoint U+00E9)
+    )->encode();
+
+    print $t->fr();    # &eacute;tude
+    print $t->en();    # study  (plain ASCII is unchanged)
+
+    # Use encoded text safely inside HTML
+    my $html = "<p>" . $t . "</p>";
 
 =head3 API SPECIFICATION
 
@@ -398,17 +691,19 @@ by calling C<encode()> only once on a freshly constructed object.
 
 =head4 Output
 
-    Returns $self (chainable).
+    # Return::Set schema
+    on_success => $self    # the same Lingua::Text object, with texts encoded
 
 =head3 FORMAL SPECIFICATION
 
+    -- Let entity : STRING -> STRING be HTML::Entities::encode_entities
+    -- and  dec   : STRING -> STRING be utf8::decode (applied only when needed)
     ┌─ encode ────────────────────────────────────────────────
     │ ΔLinguaText
-    │ encode : TEXT → TEXT
-    │ encode(t) = HTML_entity_encode(utf8_decode(t))
-    ├─────────────────────────────────────────────────────────
-    │ ∀ l ∈ dom texts • texts'(l) = encode(texts(l))
+    │ ∀ l : dom texts
+    │     • texts'(l) = entity(dec(texts(l)))
     └─────────────────────────────────────────────────────────
+    -- texts' replaces every value; dom texts is unchanged.
 
 =cut
 
@@ -424,18 +719,82 @@ sub encode {
 	return $self;
 }
 
-=head2 AUTOLOAD (language accessors)
+=head2 Language accessor methods
 
 =head3 PURPOSE
 
-Any two-letter lower-case method name that matches a valid ISO 639-1 code is
-treated as a getter/setter for that language's translation.
+Any two-letter method name that is a valid ISO 639-1 language code acts as a
+combined getter and setter for that language's translation.  These methods do
+not need to be declared; Perl's C<AUTOLOAD> mechanism intercepts them.
 
-    $t->en('Hello');       # set English
-    my $fr = $t->fr();     # get French (undef if not stored)
+    $t->en('Hello');          # store an English translation
+    my $text = $t->fr();      # retrieve the French translation (undef if not stored)
+    $t->zh('');               # store an empty string (distinct from undef/not-stored)
+    $t->en(0);                # store the string "0" (falsy values work correctly)
 
-Setting a translation to C<undef> or the empty string C<''> is valid and will
-store that value (clearing a translation is intentional).
+=head3 ARGUMENTS
+
+=over 4
+
+=item B<Setter form> -- pass one scalar argument
+
+The value is stored under the method's language code and also returned.
+
+=item B<Getter form> -- call with no arguments
+
+Returns the stored string for that language, or C<undef> if nothing has been
+stored.
+
+=back
+
+=head3 RETURN VALUE
+
+=over 4
+
+=item Returns the stored translation string (getter) or the value just stored
+(setter).
+
+=item Returns C<undef> -- silently -- when the language has no stored
+translation.
+
+=item Returns C<undef> silently for any method name that is not a recognised
+two-letter ISO 639-1 code.  This means typos (e.g. C<$t-E<gt>enn()>) fail
+invisibly.  See L</COMMON PITFALLS>.
+
+=back
+
+=head3 EXAMPLE
+
+    my $t = Lingua::Text->new();
+
+    $t->en('Good morning');
+    $t->fr('Bonjour');
+    $t->de('Guten Morgen');
+
+    print $t->en(), "\n";   # Good morning
+    print $t->ja(), "\n";   # (nothing -- no Japanese stored)
+
+    # Chaining setters is not supported; use set() for that.
+    # Setters return the stored value, not $self.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+    # Setter: one positional SCALAR (may be undef, '', or '0')
+    # Getter: no arguments
+
+=head4 Output
+
+    # Return::Set schema
+    on_set     => SCALAR | undef    # the value just stored
+    on_get     => SCALAR | undef    # the stored value, or undef if absent
+    on_invalid => undef             # silently, for non-language method names
+
+=head3 MESSAGES
+
+None.  All failure cases return C<undef> silently.  See L</COMMON PITFALLS>
+for guidance on typo detection.
 
 =cut
 
@@ -457,23 +816,157 @@ sub AUTOLOAD {
 	return $self->{'texts'}->{$key};
 }
 
+=head1 COMMON PITFALLS
+
+This section documents behaviours that often surprise first-time users.
+
+=head2 encode() cannot be undone
+
+C<encode()> modifies the object in place.  There is no C<decode()>.  If you
+call C<encode()> twice on the same object, every special character is encoded
+twice (e.g. C<&eacute;> becomes C<&amp;eacute;>).  Always call C<encode()>
+once, as the last step, and only on a freshly built object.
+
+    # WRONG -- double-encoding
+    my $t = Lingua::Text->new(fr => "\x{E9}tude")->encode()->encode();
+    print $t->fr();    # &amp;eacute;tude  (broken HTML)
+
+    # CORRECT
+    my $t = Lingua::Text->new(fr => "\x{E9}tude")->encode();
+    print $t->fr();    # &eacute;tude
+
+=head2 Missing translation returns undef, not an empty string
+
+When a translation is not stored for the requested language, C<as_string()>
+and the accessor methods return C<undef>, not C<"">.  Use C<defined()> to test
+for absence, not a truth check.
+
+    my $t = Lingua::Text->new(en => 'hello');
+
+    my $de = $t->de();
+    print "Missing\n" unless defined($de);   # correct
+    print "Missing\n" unless $de;            # WRONG -- also triggers for $de = '0'
+
+=head2 Typos in language codes are silent
+
+The AUTOLOAD accessor returns C<undef> for any two-letter name that is not a
+valid ISO 639-1 code, and also for valid codes that have no stored translation.
+A typo like C<$t-E<gt>enn()> produces C<undef> without any warning.
+
+    $t->en('hello');
+    print $t->enn();    # undef -- no warning, no error
+
+To guard against this, always check with C<defined()> and, during development,
+consider adding a test that verifies the expected languages are present.
+
+=head2 new('text') silently drops the text when no locale is set
+
+When you pass a single string to C<new()>, it is stored under the current
+system language.  If no locale environment variable (C<LANG>, C<LC_MESSAGES>,
+etc.) is set, the language cannot be determined and the text is silently
+discarded.
+
+    # Safe: locale is set
+    $ENV{LANG} = 'en_GB.UTF-8';
+    my $t = Lingua::Text->new('hello');
+    print $t->en();   # hello
+
+    # Unsafe: no locale
+    delete $ENV{LANG};
+    delete $ENV{LC_MESSAGES};
+    my $t = Lingua::Text->new('hello');   # text is lost
+    print defined($t->en()) ? $t->en() : 'lost';   # lost
+
+    # Safe alternative: always name the language explicitly
+    my $t = Lingua::Text->new(en => 'hello');
+
+=head2 set() and the language accessors return $self or the value, not the text
+
+C<set()> returns the object (C<$self>).  Because of the stringify overload,
+when you print or compare the return value, it I<looks> like a string -- but it
+is an object.  Do not rely on this behaviour; retrieve the value separately.
+
+    my $t = Lingua::Text->new();
+    my $result = $t->set(text => 'Hello', lang => 'en');
+
+    # $result is the Lingua::Text object, not the string 'Hello'
+    # This works due to stringify overload, but is misleading:
+    print $result;          # Hello (via stringify)
+
+    # Clearer intent:
+    $t->set(text => 'Hello', lang => 'en');
+    print $t->as_string('en');   # Hello
+
+The AUTOLOAD setter (e.g. C<$t-E<gt>en('Hello')>) returns the stored value
+directly, not C<$self>.
+
+=head2 A Lingua::Text object is always true
+
+The object overloads the boolean C<bool> operator to always return true, even
+when it contains no translations.  Do B<not> use an object as a truth test to
+check whether it has any content.
+
+    my $t = Lingua::Text->new();   # empty
+    if($t) { print "always reached\n"; }   # always true
+
+    # To check whether a specific language is stored:
+    if(defined($t->en())) { print "English is stored\n"; }
+
+=head2 Function-style call with arguments is an error
+
+Perl allows calling methods as functions, but Lingua::Text::new() (with
+double-colon and arguments) will emit a warning and return C<undef>.
+
+    my $t = Lingua::Text::new(en => 'hi');   # WRONG -- carp warning, returns undef
+    my $t = Lingua::Text->new(en => 'hi');   # correct
+
+Calling C<Lingua::Text::new()> with B<no> arguments works (it creates an empty
+object), but the arrow form is still preferred.
+
 =head1 LIMITATIONS
 
 =over 4
 
-=item * No C<decode()> method exists to reverse C<encode()>.  Double-encoding
-is a real risk if C<encode()> is called on an already-encoded object.
+=item * B<No decode()>: Once C<encode()> is called, all translations are
+HTML-entity-encoded.  There is no method to reverse this.
 
-=item * Language fallback is absent: if a requested language has no stored
-translation, C<undef> is returned rather than falling back to a related locale
-(e.g. C<en_GB> → C<en>).
+=item * B<No language fallback>: If C<en_GB> is the system locale but only
+C<en> is stored, the module finds the text correctly (because the country
+suffix is stripped).  However, if C<en_GB> is stored as a key and the system
+locale is C<en_US>, the text is I<not> found.  Only two-letter codes are used
+as storage keys.
 
-=item * The AUTOLOAD accessor silently ignores unrecognised method names that
-are not two-letter codes, returning C<undef>.  Typos in language codes produce
-no diagnostic.
+=item * B<Silent AUTOLOAD failures>: Unrecognised method names (including
+typos) return C<undef> without any diagnostic.
 
-=item * C<Object::Configure> support is best-effort; the exact semantics depend
-on the installed version and any project-level configuration that is present.
+=item * B<Object::Configure semantics>: The exact effect of
+L<Object::Configure> depends on the installed version and any project-level
+configuration present.  Without a configuration file, it passes parameters
+through unchanged.
+
+=back
+
+=head1 DEPENDENCIES
+
+Runtime:
+
+=over 4
+
+=item * L<Carp> -- C<carp>/C<croak> for warnings and errors
+
+=item * L<HTML::Entities> -- HTML entity encoding in C<encode()>
+
+=item * L<I18N::LangTags::Detect> -- locale detection from environment variables
+
+=item * L<Object::Configure> -- optional config-file defaults for C<new()>
+
+=item * L<Params::Get> -- flexible argument parsing for public methods
+
+=item * L<Readonly> -- constant definitions for the message catalog and patterns
+
+=item * L<Scalar::Util> -- C<blessed()> for safe type testing
+
+=item * L<Sub::Private> -- enforcement of private method access
 
 =back
 
@@ -483,13 +976,17 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 =head1 BUGS
 
-Please report bugs via L<https://github.com/nigelhorne/Lingua-Text/issues>.
+Please report bugs at L<https://github.com/nigelhorne/Lingua-Text/issues>.
 
 =head1 SEE ALSO
 
 =over 4
 
-=item * L<Configure an Object at Runtime|Object::Configure>
+=item * L<Object::Configure> -- runtime object configuration
+
+=item * L<I18N::LangTags::Detect> -- the locale detection module used internally
+
+=item * L<HTML::Entities> -- the HTML encoding module used by C<encode()>
 
 =item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
 
@@ -499,33 +996,23 @@ Please report bugs via L<https://github.com/nigelhorne/Lingua-Text/issues>.
 
 This module is provided as-is without any warranty.
 
-You can find documentation for this module with the perldoc command.
+Documentation:
 
     perldoc Lingua::Text
 
-You can also look for information at:
+Online resources:
 
 =over 4
 
-=item * MetaCPAN
+=item * MetaCPAN: L<https://metacpan.org/release/Lingua-Text>
 
-L<https://metacpan.org/release/Lingua-Text>
+=item * Bug tracker: L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text>
 
-=item * RT: CPAN's request tracker
+=item * CPANTS: L<http://cpants.cpanauthors.org/dist/Lingua-Text>
 
-L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text>
+=item * CPAN Testers: L<http://matrix.cpantesters.org/?dist=Lingua-Text>
 
-=item * CPANTS
-
-L<http://cpants.cpanauthors.org/dist/Lingua-Text>
-
-=item * CPAN Testers' Matrix
-
-L<http://matrix.cpantesters.org/?dist=Lingua-Text>
-
-=item * CPAN Testers Dependencies
-
-L<http://deps.cpantesters.org/?module=Lingua-Text>
+=item * Dependencies: L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 =back
 
