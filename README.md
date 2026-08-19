@@ -182,6 +182,32 @@ with arguments (e.g. `Lingua::Text::new(en =` 'hi')> without the arrow).
 
     # OR a single SCALAR (stored under the current locale language)
 
+#### Language key domain
+
+Keys passed to `new()` are stored verbatim in the internal `{texts}` hash
+without validation at construction time.  Access restrictions come from the
+consumers:
+
+- **AUTOLOAD accessor** -- only installs an accessor for keys matching
+`/^[a-z]{2}$/`: exactly two lower-case ASCII letters.  `en_US` (with
+country suffix), `eng` (three letters), `EN` (upper-case) and all other
+keys are silently ignored by the accessor mechanism.
+- **encode()** -- only processes keys accepted by `_is_valid_language()`:
+`/^[a-z]{2}(?:_[A-Z]{2})?$/`.  Keys with `en_US`-style country suffixes
+are encoded; non-language keys injected by [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) (e.g.
+`logger`, `config_path`) are skipped.
+
+    # Equivalence partitions for language keys
+    #
+    # PARTITION          EXAMPLE    AUTOLOAD    encode()
+    # --------------------------------------------------------
+    # 2-lower (valid)    'en'       YES         YES
+    # 2-lower + _XX      'en_US'    NO          YES
+    # 1 char             'e'        NO          NO
+    # 3+ chars           'eng'      NO          NO
+    # uppercase          'EN'       NO          NO
+    # non-alpha          '12'       NO          NO
+
 #### Output
 
     # Return::Set schema
@@ -254,6 +280,41 @@ missing or when no language can be determined.
         default  => _get_language(),     # falls back to system locale
         regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
     }
+
+#### lang parameter domain (BVA)
+
+The `lang` value is validated by the regex `/^[a-z]{2}(?:_[A-Z]{2})?$/`.
+
+    # BOUNDARY VALUE ANALYSIS
+    #
+    # PARTITION                  EXAMPLE     VALID?  REASON
+    # -------------------------------------------------------
+    # 1 char (below minimum)     'e'         NO      too short
+    # 2 lowercase (MINIMUM)      'en'        YES     minimum valid length
+    # 3 lowercase                'eng'       NO      exceeds simple maximum
+    # 5 chars with suffix (MAX)  'en_US'     YES     2-lower + _ + 2-UPPER
+    # 6 chars, country 3-long    'en_USA'    NO      country must be exactly 2
+    # 4 chars, country 1-long    'en_U'      NO      country must be exactly 2
+    # trailing underscore only   'en_'       NO      country code absent
+    # 2 uppercase                'EN'        NO      must be lower-case
+    # mixed case                 'En'        NO      must be lower-case
+    # 2 digits                   '12'        NO      digits not in [a-z]
+    # empty string               ''          NO      zero length
+
+#### text parameter domain
+
+Any defined scalar is a valid text value.  Length has no documented limit.
+
+    # BOUNDARY VALUE ANALYSIS
+    #
+    # PARTITION          EXAMPLE              VALID?  REASON
+    # ---------------------------------------------------------------
+    # empty string       ''                   YES     length 0 (minimum)
+    # falsy '0'          '0'                  YES     defined, even if falsy
+    # regular ASCII      'hello'              YES     representative valid
+    # Unicode            "\x{E9}tude"         YES     stored verbatim
+    # 1 MB string        'x' x 1_000_000      YES     no documented size limit
+    # undef              undef                NO      undefined = missing text
 
 #### Output
 
@@ -338,8 +399,29 @@ be determined (no argument supplied _and_ no locale environment variable set).
         type     => 'string',
         optional => 1,
         default  => _get_language(),
-        regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
+        # NOTE: unlike set(), as_string() performs NO format validation on
+        # the lang argument.  Any defined scalar is used directly as a hash
+        # key into the internal {texts} store.  An unrecognised key simply
+        # returns undef without a warning (the 'on_not_found' state below).
     }
+
+#### lang argument domain
+
+    # EQUIVALENCE PARTITIONS
+    #
+    # INPUT                        RESULT
+    # ---------------------------------------------------------------
+    # Stored key ('en' exists)     returns the text (no warning)
+    # Valid format, not stored     returns undef    (no warning)
+    # Invalid format, not stored   returns undef    (no warning)
+    # Empty string ''              returns undef    (no warning)
+    # undef                        falls back to _get_language()
+    # no argument                  falls back to _get_language()
+    #
+    # Argument forms accepted:
+    #   as_string('en')              positional
+    #   as_string(lang => 'en')      named hash
+    #   as_string({ lang => 'en' })  hash reference
 
 #### Output
 
@@ -452,10 +534,43 @@ invisibly.  See ["COMMON PITFALLS"](#common-pitfalls).
 
 ### API SPECIFICATION
 
+#### Method name domain (BVA)
+
+The accessor is only created for method names that match `/^[a-z]{2}$/`:
+exactly two lower-case ASCII letters.  All other names return `undef`
+silently and never install an accessor.
+
+    # BOUNDARY VALUE ANALYSIS
+    #
+    # NAME              CHARS  MATCHES /^[a-z]{2}$/  RESULT
+    # ---------------------------------------------------------------
+    # 'e'               1      NO (below minimum)     undef (silent)
+    # 'en'              2      YES (minimum valid)    accessor works
+    # 'eng'             3      NO (above maximum)     undef (silent)
+    # 'EN'              2      NO (uppercase)         undef (silent)
+    # 'En'              2      NO (mixed case)        undef (silent)
+    # 'en_US'           5      NO (underscore)        undef (silent)
+
 #### Input
 
     # Setter: one positional SCALAR (may be undef, '', or '0')
     # Getter: no arguments
+
+#### Value domain (setter)
+
+Any scalar value -- including `undef`, `''`, and `'0'` -- is accepted
+and stored verbatim.  `encode()` will later skip `undef` and reference
+values; the accessor itself is a transparent store.
+
+    # EQUIVALENCE PARTITIONS
+    #
+    # VALUE        STORED?  ENCODE() EFFECT
+    # --------------------------------------------------
+    # 'hello'      YES      encoded if non-ASCII chars
+    # ''           YES      unchanged (no entities)
+    # '0'          YES      unchanged
+    # undef        YES      skipped by encode() (preserved)
+    # arrayref     YES      skipped by encode() (preserved)
 
 #### Output
 

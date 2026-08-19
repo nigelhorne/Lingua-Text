@@ -13,6 +13,7 @@ t/carp.t
 t/cgi_security.t
 t/comment-spelling.t
 t/data-flow.t
+t/domain.t
 t/edge_cases.t
 t/eof.t
 t/eol.t
