@@ -300,10 +300,15 @@ sub new {
 		$class = __PACKAGE__;
 	}
 
-	# Build the initial parameter hash from whatever form the caller used
+	# Build the initial parameter hash from whatever form the caller used.
+	# A single non-ref scalar is the positional form: store under the locale lang
+	# if one is detected, or silently discard it when no locale is set (the
+	# documented pitfall).  We must NOT let it reach get_params(), which croaks
+	# on an odd-length list (get_params(undef, $scalar) = 1 arg = odd).
 	my $params;
-	if((scalar(@_) == 1) && (!ref($_[0])) && (my $lang = _get_language())) {
-		$params = { $lang => $_[0] };
+	if((scalar(@_) == 1) && (!ref($_[0]))) {
+		my $lang = _get_language();
+		$params = { $lang => $_[0] } if $lang;
 	} elsif(@_) {
 		$params = Params::Get::get_params(undef, @_);
 	}
@@ -754,7 +759,8 @@ sub AUTOLOAD {
 # Effects:  None.
 sub _err :Private {
 	my ($key) = @_;
-	return sprintf($MESSAGES{$key} // "Unknown internal error: $key", __PACKAGE__);
+	my $fmt = $MESSAGES{$key};
+	return defined($fmt) ? sprintf($fmt, __PACKAGE__) : "Unknown internal error: $key";
 }
 
 # Purpose:  Issue a carp warning for a set() usage mistake and return undef.
