@@ -12,6 +12,7 @@ t/30-basics.t
 t/carp.t
 t/cgi_security.t
 t/comment-spelling.t
+t/data-flow.t
 t/edge_cases.t
 t/eof.t
 t/eol.t
