@@ -121,6 +121,12 @@ Autoload will do this for you as
 sub set
 {
 	my $self = shift;
+
+	if(!@_) {
+		Carp::croak(__PACKAGE__, ': Usage: set(text => text, lang => $language)');
+		return;
+	}
+
 	my $params = Params::Get::get_params('text', @_);
 
 	my $lang = $params->{'lang'} || $self->_get_language();
