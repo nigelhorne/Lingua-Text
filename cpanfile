@@ -7,6 +7,7 @@ requires 'Exporter';
 requires 'ExtUtils::MakeMaker', '6.64';   # 6.64 for TEST_REQUIRES
 requires 'HTML::Entities';
 requires 'I18N::LangTags::Detect';
+requires 'Object::Configure';
 requires 'Params::Get';
 requires 'Scalar::Util';
 

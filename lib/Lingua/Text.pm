@@ -5,6 +5,7 @@ use warnings;
 
 use Carp;
 use HTML::Entities;
+use Object::Configure;
 use Params::Get;
 use Scalar::Util;
 use I18N::LangTags::Detect;
@@ -74,15 +75,15 @@ sub new {
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args;
+	my $params;
 	if((scalar(@_) == 1) && (!ref($_[0])) && (my $lang = _get_language())) {
-		$args{$lang} = $_[0];
-	} elsif(my $params = Params::Get::get_params(undef, @_)) {
-		%args = %{$params};
+		$params->{$lang} = $_[0];
+	} else {
+		$params = Params::Get::get_params(undef, @_);
 	}
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
+		if((scalar keys %{$params}) > 0) {
 			# Using Lingua::Text->new(), not Lingua::Text::new()
 			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
 			return;
@@ -92,15 +93,16 @@ sub new {
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		if(scalar(%args)) {
-			return bless { texts => {%{$class->{'texts'}}, %args} }, ref($class);
+		if($params) {
+			return bless { texts => {%{$class->{'texts'}}, %{$params}} }, ref($class);
 		}
 		return bless { %{$class} }, ref($class);
 	}
 
+	$params = Object::Configure::configure($class, $params);
 	# Return the blessed object
-	if(scalar(%args)) {
-		return bless { texts => \%args }, $class;
+	if($params) {
+		return bless { texts => $params }, $class;
 	}
 
 	return bless { }, $class;
@@ -274,6 +276,14 @@ so you'll have to be extra careful to avoid double encoding.
 
 =head1 SEE ALSO
 
+=over 4
+
+=item * L<Configure an Object at Runtime|Object::Configure>
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/>
+
+=back
+
 =head1 SUPPORT
 
 This module is provided as-is without any warranty.
@@ -312,10 +322,9 @@ L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 Copyright 2021-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2 for personal use on
-a single computer.
-All other users (for example, Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at `<njh at nigelhorne.com>`.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

@@ -4,6 +4,7 @@ Revision history for Lingua-Text
 	[ Enhancements ]
 	- Validate the language in AUTOLOAD
 	- Only allow 2-letter language codes
+	- Support runtime configuration via Object::Configure
 	[ Bug Fixes ]
 	- Fix https://github.com/nigelhorne/Lingua-Text/issues/16
 

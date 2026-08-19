@@ -31,6 +31,7 @@ WriteMakefile(
 		'HTML::Entities' => 0,
 		'I18N::LangTags::Detect' => 0,
 		'Params::Get' => 0,
+		'Object::Configure' => 0,
 		'Scalar::Util' => 0
 	}, TEST_REQUIRES => {
 		'IPC::System::Simple' => 0,
