@@ -110,8 +110,6 @@ during lookup.
 
 ## new
 
-### PURPOSE
-
 Create a new Lingua::Text object.  The object starts empty, or pre-loaded
 with one or more translations you provide.
 
@@ -176,8 +174,8 @@ with arguments (e.g. `Lingua::Text::new(en =` 'hi')> without the arrow).
     # Params::Validate::Strict-compatible schema
     # (all parameters are optional; the whole argument list may be empty)
 
-    en   => { type => SCALAR, optional => 1 }   # and any other ISO 639-1 code
-    fr   => { type => SCALAR, optional => 1 }
+    en   => { type => 'string', optional => 1 }   # and any other ISO 639-1 code
+    fr   => { type => 'string', optional => 1 }
     ...  # one key per language
 
     # OR a single HASHREF containing the same keys
@@ -197,37 +195,7 @@ with arguments (e.g. `Lingua::Text::new(en =` 'hi')> without the arrow).
     You called `Lingua::Text::new(...)` (double-colon, function style) with
     arguments.  Use `Lingua::Text->new(...)` (arrow, method style) instead.
 
-### FORMAL SPECIFICATION
-
-    -- Type definitions
-    STRING == seq CHAR
-    LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
-
-    -- State: a partial function from language codes to strings
-    ┌─ LinguaText ────────────────────────────────────────────
-    │ texts : LANG ⇸ STRING
-    └─────────────────────────────────────────────────────────
-
-    -- Construction: initialise texts from zero or more lang/string pairs
-    ┌─ new ───────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ init? : LANG ⇸ STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = init?
-    └─────────────────────────────────────────────────────────
-
-    -- Clone: merge the parent's texts with any new pairs (new pairs win)
-    ┌─ clone ─────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ parent? : LinguaText
-    │ extra?  : LANG ⇸ STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = parent?.texts ⊕ extra?
-    └─────────────────────────────────────────────────────────
-
 ## set
-
-### PURPOSE
 
 Store or replace a single translation.  Use this when the language code is
 held in a variable at runtime; if the language is fixed at coding time, the
@@ -278,11 +246,10 @@ missing or when no language can be determined.
 
     # Params::Validate::Strict-compatible schema
     text => {
-        type     => SCALAR,
-        required => 1,
+        type     => 'string',
     },
     lang => {
-        type     => SCALAR,
+        type     => 'string',
         optional => 1,
         default  => _get_language(),     # falls back to system locale
         regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
@@ -310,21 +277,7 @@ missing or when no language can be determined.
     ISO 639-1 validation check (e.g. a three-letter code like `'abc'`).
     Pass `lang` as a two-letter code (e.g. `'en'`) to resolve all three.
 
-### FORMAL SPECIFICATION
-
-    -- set: add or replace one translation; all others remain unchanged
-    ┌─ set ───────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ lang? : LANG
-    │ text? : STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = texts ⊕ { lang? ↦ text? }
-    └─────────────────────────────────────────────────────────
-    -- ⊕ denotes relational override: lang? wins over any existing entry
-
 ## as\_string
-
-### PURPOSE
 
 Return the stored translation for a given language, or for the system locale
 when no language is specified.
@@ -382,7 +335,7 @@ be determined (no argument supplied _and_ no locale environment variable set).
 
     # Params::Validate::Strict-compatible schema
     lang => {
-        type     => SCALAR,
+        type     => 'string',
         optional => 1,
         default  => _get_language(),
         regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
@@ -403,22 +356,7 @@ be determined (no argument supplied _and_ no locale environment variable set).
     `LC_MESSAGES`, `LC_ALL`, `LANGUAGE`) is set.  Either pass the language
     explicitly or set the locale before calling.
 
-### FORMAL SPECIFICATION
-
-    -- as_string: look up one translation; state is unchanged (Xi schema)
-    ┌─ as_string ─────────────────────────────────────────────
-    │ ΞLinguaText
-    │ lang?    : LANG ∪ { current_locale }
-    │ result!  : STRING ∪ { undef }
-    ├─────────────────────────────────────────────────────────
-    │ lang? ∈ dom texts  ⟹  result! = texts(lang?)
-    │ lang? ∉ dom texts  ⟹  result! = undef
-    └─────────────────────────────────────────────────────────
-    -- The state schema Ξ means texts is not modified by this operation.
-
 ## encode
-
-### PURPOSE
 
 Convert every stored translation from raw Unicode text to HTML entities.
 Call this once on an object before embedding its text in HTML pages, to make
@@ -466,20 +404,7 @@ onto `new()`.
     # Return::Set schema
     on_success => $self    # the same Lingua::Text object, with texts encoded
 
-### FORMAL SPECIFICATION
-
-    -- Let entity : STRING -> STRING be HTML::Entities::encode_entities
-    -- and  dec   : STRING -> STRING be utf8::decode (applied only when needed)
-    ┌─ encode ────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ ∀ l : dom texts
-    │     • texts'(l) = entity(dec(texts(l)))
-    └─────────────────────────────────────────────────────────
-    -- texts' replaces every value; dom texts is unchanged.
-
 ## Language accessor methods
-
-### PURPOSE
 
 Any two-letter method name that is a valid ISO 639-1 language code acts as a
 combined getter and setter for that language's translation.  These methods do
@@ -739,6 +664,72 @@ Online resources:
 - CPANTS: [http://cpants.cpanauthors.org/dist/Lingua-Text](http://cpants.cpanauthors.org/dist/Lingua-Text)
 - CPAN Testers: [http://matrix.cpantesters.org/?dist=Lingua-Text](http://matrix.cpantesters.org/?dist=Lingua-Text)
 - Dependencies: [http://deps.cpantesters.org/?module=Lingua-Text](http://deps.cpantesters.org/?module=Lingua-Text)
+
+# FORMAL SPECIFICATION
+
+## new
+
+    -- Type definitions
+    STRING == seq CHAR
+    LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
+
+    -- State: a partial function from language codes to strings
+    ┌─ LinguaText ────────────────────────────────────────────
+    │ texts : LANG ⇸ STRING
+    └─────────────────────────────────────────────────────────
+
+    -- Construction: initialise texts from zero or more lang/string pairs
+    ┌─ new ───────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ init? : LANG ⇸ STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = init?
+    └─────────────────────────────────────────────────────────
+
+    -- Clone: merge the parent's texts with any new pairs (new pairs win)
+    ┌─ clone ─────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ parent? : LinguaText
+    │ extra?  : LANG ⇸ STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = parent?.texts ⊕ extra?
+    └─────────────────────────────────────────────────────────
+
+## set
+
+    -- set: add or replace one translation; all others remain unchanged
+    ┌─ set ───────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ lang? : LANG
+    │ text? : STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = texts ⊕ { lang? ↦ text? }
+    └─────────────────────────────────────────────────────────
+    -- ⊕ denotes relational override: lang? wins over any existing entry
+
+## as\_string
+
+    -- as_string: look up one translation; state is unchanged (Xi schema)
+    ┌─ as_string ─────────────────────────────────────────────
+    │ ΞLinguaText
+    │ lang?    : LANG ∪ { current_locale }
+    │ result!  : STRING ∪ { undef }
+    ├─────────────────────────────────────────────────────────
+    │ lang? ∈ dom texts  ⟹  result! = texts(lang?)
+    │ lang? ∉ dom texts  ⟹  result! = undef
+    └─────────────────────────────────────────────────────────
+    -- The state schema Ξ means texts is not modified by this operation.
+
+## encode
+
+    -- Let entity : STRING -> STRING be HTML::Entities::encode_entities
+    -- and  dec   : STRING -> STRING be utf8::decode (applied only when needed)
+    ┌─ encode ────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ ∀ l : dom texts
+    │     • texts'(l) = entity(dec(texts(l)))
+    └─────────────────────────────────────────────────────────
+    -- texts' replaces every value; dom texts is unchanged.
 
 # LICENCE AND COPYRIGHT
 

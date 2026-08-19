@@ -17,19 +17,17 @@ use I18N::LangTags::Detect;
 BEGIN { $Sub::Private::config{mode} = 'enforce' }
 use Sub::Private;
 
-=encoding utf-8
-
 =head1 NAME
 
 Lingua::Text - Store the same text in many languages; retrieve it in the user's language automatically
 
 =head1 VERSION
 
-Version 0.08
+Version 0.07
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.07';
 our $AUTOLOAD;
 
 # ---------------------------------------------------------------------------
@@ -178,8 +176,6 @@ during lookup.
 
 =head2 new
 
-=head3 PURPOSE
-
 Create a new Lingua::Text object.  The object starts empty, or pre-loaded
 with one or more translations you provide.
 
@@ -248,8 +244,8 @@ with arguments (e.g. C<Lingua::Text::new(en => 'hi')> without the arrow).
     # Params::Validate::Strict-compatible schema
     # (all parameters are optional; the whole argument list may be empty)
 
-    en   => { type => SCALAR, optional => 1 }   # and any other ISO 639-1 code
-    fr   => { type => SCALAR, optional => 1 }
+    en   => { type => 'string', optional => 1 }   # and any other ISO 639-1 code
+    fr   => { type => 'string', optional => 1 }
     ...  # one key per language
 
     # OR a single HASHREF containing the same keys
@@ -273,34 +269,6 @@ arguments.  Use C<Lingua::Text-E<gt>new(...)> (arrow, method style) instead.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-    -- Type definitions
-    STRING == seq CHAR
-    LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
-
-    -- State: a partial function from language codes to strings
-    ┌─ LinguaText ────────────────────────────────────────────
-    │ texts : LANG ⇸ STRING
-    └─────────────────────────────────────────────────────────
-
-    -- Construction: initialise texts from zero or more lang/string pairs
-    ┌─ new ───────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ init? : LANG ⇸ STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = init?
-    └─────────────────────────────────────────────────────────
-
-    -- Clone: merge the parent's texts with any new pairs (new pairs win)
-    ┌─ clone ─────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ parent? : LinguaText
-    │ extra?  : LANG ⇸ STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = parent?.texts ⊕ extra?
-    └─────────────────────────────────────────────────────────
-
 =cut
 
 sub new {
@@ -310,7 +278,10 @@ sub new {
 	# A legitimate invocant is either a blessed object (clone) or a class name
 	# that inherits from this package.  Anything else (e.g. the first key of a
 	# hash accidentally consumed as the invocant) triggers a warning.
-	my $is_class  = !ref($class) && defined($class) && eval { $class->isa(__PACKAGE__) };
+	# SECURITY: call UNIVERSAL::isa() as a function, not as a method on $class.
+	# Method dispatch on an attacker-controlled string would invoke any isa()
+	# defined on that package; the function form bypasses method resolution.
+	my $is_class  = !ref($class) && defined($class) && eval { UNIVERSAL::isa($class, __PACKAGE__) };
 	my $is_object = blessed($class);
 
 	# Syllogism:
@@ -351,8 +322,6 @@ sub new {
 }
 
 =head2 set
-
-=head3 PURPOSE
 
 Store or replace a single translation.  Use this when the language code is
 held in a variable at runtime; if the language is fixed at coding time, the
@@ -403,11 +372,10 @@ missing or when no language can be determined.
 
     # Params::Validate::Strict-compatible schema
     text => {
-        type     => SCALAR,
-        required => 1,
+        type     => 'string',
     },
     lang => {
-        type     => SCALAR,
+        type     => 'string',
         optional => 1,
         default  => _get_language(),     # falls back to system locale
         regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
@@ -439,18 +407,6 @@ Pass C<lang> as a two-letter code (e.g. C<'en'>) to resolve all three.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-    -- set: add or replace one translation; all others remain unchanged
-    ┌─ set ───────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ lang? : LANG
-    │ text? : STRING
-    ├─────────────────────────────────────────────────────────
-    │ texts' = texts ⊕ { lang? ↦ text? }
-    └─────────────────────────────────────────────────────────
-    -- ⊕ denotes relational override: lang? wins over any existing entry
-
 =cut
 
 sub set {
@@ -460,7 +416,10 @@ sub set {
 
 	my $params = Params::Get::get_params('text', @_);
 
-	my $lang = $params->{'lang'} || _get_language();
+	# SECURITY: use // (defined-or), not || (truthiness).
+	# || would silently substitute the system locale when the caller explicitly
+	# passes lang => '' or lang => '0', masking an invalid-argument error.
+	my $lang = $params->{'lang'} // _get_language();
 	return _carp_set_usage() unless defined($lang);
 
 	# Syllogism:
@@ -478,8 +437,6 @@ sub set {
 }
 
 =head2 as_string
-
-=head3 PURPOSE
 
 Return the stored translation for a given language, or for the system locale
 when no language is specified.
@@ -543,7 +500,7 @@ be determined (no argument supplied I<and> no locale environment variable set).
 
     # Params::Validate::Strict-compatible schema
     lang => {
-        type     => SCALAR,
+        type     => 'string',
         optional => 1,
         default  => _get_language(),
         regex    => qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
@@ -567,19 +524,6 @@ C<LC_MESSAGES>, C<LC_ALL>, C<LANGUAGE>) is set.  Either pass the language
 explicitly or set the locale before calling.
 
 =back
-
-=head3 FORMAL SPECIFICATION
-
-    -- as_string: look up one translation; state is unchanged (Xi schema)
-    ┌─ as_string ─────────────────────────────────────────────
-    │ ΞLinguaText
-    │ lang?    : LANG ∪ { current_locale }
-    │ result!  : STRING ∪ { undef }
-    ├─────────────────────────────────────────────────────────
-    │ lang? ∈ dom texts  ⟹  result! = texts(lang?)
-    │ lang? ∉ dom texts  ⟹  result! = undef
-    └─────────────────────────────────────────────────────────
-    -- The state schema Ξ means texts is not modified by this operation.
 
 =cut
 
@@ -609,8 +553,6 @@ sub as_string {
 }
 
 =head2 encode
-
-=head3 PURPOSE
 
 Convert every stored translation from raw Unicode text to HTML entities.
 Call this once on an object before embedding its text in HTML pages, to make
@@ -658,25 +600,28 @@ onto C<new()>.
     # Return::Set schema
     on_success => $self    # the same Lingua::Text object, with texts encoded
 
-=head3 FORMAL SPECIFICATION
-
-    -- Let entity : STRING -> STRING be HTML::Entities::encode_entities
-    -- and  dec   : STRING -> STRING be utf8::decode (applied only when needed)
-    ┌─ encode ────────────────────────────────────────────────
-    │ ΔLinguaText
-    │ ∀ l : dom texts
-    │     • texts'(l) = entity(dec(texts(l)))
-    └─────────────────────────────────────────────────────────
-    -- texts' replaces every value; dom texts is unchanged.
-
 =cut
 
 sub encode {
 	my $self = shift;
 
-	# Iterate over keys to avoid stale iterator state from each()
+	# Iterate over keys to avoid stale iterator state from each().
 	for my $lang (keys %{$self->{'texts'}}) {
+		# SECURITY V2: Object::Configure may inject non-language keys (e.g. 'logger')
+		# that carry blessed references.  utf8::decode() modifies its argument IN
+		# PLACE, which would corrupt the referenced object's internal string buffer.
+		# encode_entities() would then stringify it, potentially leaking its repr.
+		# Only process keys that satisfy the object invariant (valid ISO 639-1 code).
+		next unless _is_valid_language($lang);
+
 		my $v = $self->{'texts'}->{$lang};
+
+		# SECURITY V3: a caller may store undef via $t->en(undef).  utf8::decode(undef)
+		# emits "Use of uninitialized value" under 'use warnings' and is a no-op,
+		# but encode_entities(undef) returns '' which silently drops the entry.
+		# Skip explicitly so the stored undef is preserved unchanged.
+		next unless defined($v) && !ref($v);
+
 		utf8::decode($v) unless utf8::is_utf8($v);
 		$self->{'texts'}->{$lang} = HTML::Entities::encode_entities($v);
 	}
@@ -684,8 +629,6 @@ sub encode {
 }
 
 =head2 Language accessor methods
-
-=head3 PURPOSE
 
 Any two-letter method name that is a valid ISO 639-1 language code acts as a
 combined getter and setter for that language's translation.  These methods do
@@ -856,23 +799,23 @@ sub _carp_set_usage :Private {
 		}
 
 		# Slow path: probe the environment.
-		# Each /^[a-z]{2}/i check uses substr() to extract the code rather than a
-		# capturing group, avoiding $1 allocation for a fixed-width 2-char prefix.
+		# SECURITY V1 (taint mode): under perl -T, %ENV values are tainted.
+		# Perl only untaints a substring via a regex CAPTURE GROUP -- the captured
+		# $1 is untainted once the match succeeds.  substr() on a tainted string
+		# propagates taint, so the previous substr()-based extraction was wrong
+		# for taint-mode callers.  Restore explicit capturing groups here.
 		my $lang;
 		for my $tag (I18N::LangTags::Detect::detect()) {
-			if($tag =~ /^[a-z]{2}/i) { $lang = lc(substr($tag, 0, 2)); last }
+			if($tag =~ /^([a-z]{2})/i) { $lang = lc($1); last }    # $1 untainted
 		}
-		if(!defined($lang)) {
-			my $language_env = $ENV{'LANGUAGE'} // '';
-			if($language_env =~ /^[a-z]{2}/i) {
-				$lang = lc(substr($language_env, 0, 2));
-			}
+		if(!defined($lang) && ($ENV{'LANGUAGE'} // '') =~ /^([a-z]{2})/i) {
+			$lang = lc($1);    # $1 untainted
 		}
 		if(!defined($lang)) {
 			for my $var ('LC_ALL', 'LC_MESSAGES', 'LANG') {
 				my $val = $ENV{$var} // next;
-				if($val =~ /^[a-z]{2}/i) {
-					my $code = lc(substr($val, 0, 2));
+				if($val =~ /^([a-z]{2})/i) {
+					my $code = lc($1);    # $1 untainted
 					if(_is_valid_language($code)) { $lang = $code; last }
 				}
 			}
@@ -1130,6 +1073,74 @@ Online resources:
 =item * Dependencies: L<http://deps.cpantesters.org/?module=Lingua-Text>
 
 =back
+
+=encoding utf-8
+
+=head1 FORMAL SPECIFICATION
+
+=head2 new
+
+    -- Type definitions
+    STRING == seq CHAR
+    LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
+
+    -- State: a partial function from language codes to strings
+    ┌─ LinguaText ────────────────────────────────────────────
+    │ texts : LANG ⇸ STRING
+    └─────────────────────────────────────────────────────────
+
+    -- Construction: initialise texts from zero or more lang/string pairs
+    ┌─ new ───────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ init? : LANG ⇸ STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = init?
+    └─────────────────────────────────────────────────────────
+
+    -- Clone: merge the parent's texts with any new pairs (new pairs win)
+    ┌─ clone ─────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ parent? : LinguaText
+    │ extra?  : LANG ⇸ STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = parent?.texts ⊕ extra?
+    └─────────────────────────────────────────────────────────
+
+=head2 set
+
+    -- set: add or replace one translation; all others remain unchanged
+    ┌─ set ───────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ lang? : LANG
+    │ text? : STRING
+    ├─────────────────────────────────────────────────────────
+    │ texts' = texts ⊕ { lang? ↦ text? }
+    └─────────────────────────────────────────────────────────
+    -- ⊕ denotes relational override: lang? wins over any existing entry
+
+=head2 as_string
+
+    -- as_string: look up one translation; state is unchanged (Xi schema)
+    ┌─ as_string ─────────────────────────────────────────────
+    │ ΞLinguaText
+    │ lang?    : LANG ∪ { current_locale }
+    │ result!  : STRING ∪ { undef }
+    ├─────────────────────────────────────────────────────────
+    │ lang? ∈ dom texts  ⟹  result! = texts(lang?)
+    │ lang? ∉ dom texts  ⟹  result! = undef
+    └─────────────────────────────────────────────────────────
+    -- The state schema Ξ means texts is not modified by this operation.
+
+=head2 encode
+
+    -- Let entity : STRING -> STRING be HTML::Entities::encode_entities
+    -- and  dec   : STRING -> STRING be utf8::decode (applied only when needed)
+    ┌─ encode ────────────────────────────────────────────────
+    │ ΔLinguaText
+    │ ∀ l : dom texts
+    │     • texts'(l) = entity(dec(texts(l)))
+    └─────────────────────────────────────────────────────────
+    -- texts' replaces every value; dom texts is unchanged.
 
 =head1 LICENCE AND COPYRIGHT
 
