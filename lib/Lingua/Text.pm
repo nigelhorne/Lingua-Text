@@ -282,10 +282,18 @@ sub new {
 	# Method dispatch on an attacker-controlled string would invoke any isa()
 	# defined on that package; the function form bypasses method resolution.
 	my $is_class  = !ref($class) && defined($class) && eval { UNIVERSAL::isa($class, __PACKAGE__) };
-	my $is_object = blessed($class);
+
+	# A valid object invocant must be a Lingua::Text instance (or subclass),
+	# not just any blessed reference.  A foreign blessed object (e.g. from
+	# a completely unrelated package) would pass `blessed()` but crash the clone
+	# path at `%{$class->{'texts'}}` because it has no 'texts' slot.
+	# UNIVERSAL::isa() as a function is used (not method dispatch) for the same
+	# security reason as above.
+	my $is_object = blessed($class) && UNIVERSAL::isa($class, __PACKAGE__);
 
 	# Syllogism:
-	# P1: A valid invocant is a blessed object (clone path) or a class name (isa check).
+	# P1: A valid invocant is a Lingua::Text blessed object (clone path) or
+	#     a class name that inherits from Lingua::Text (isa check).
 	# P2: !defined($class) implies both $is_class and $is_object are false
 	#     (each requires defined($class) in their own derivation).
 	# Conclusion: De Morgan reduction -- the original

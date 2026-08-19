@@ -83,7 +83,7 @@ subtest 'synopsis 1 -- locale-driven stringify' => sub {
 subtest 'synopsis 2 -- accessor construction + explicit as_string' => sub {
 	local %ENV;
 
-	my $label = Lingua::Text->new();
+	my $label = new_ok('Lingua::Text');
 	$label->en('Submit');
 	$label->fr('Envoyer');
 	$label->de('Abschicken');
