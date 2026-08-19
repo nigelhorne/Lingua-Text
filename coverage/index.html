@@ -139,7 +139,7 @@
 	<a href="https://github.com/nigelhorne/Lingua-Text">
 		<img src="https://img.shields.io/github/stars/nigelhorne/Lingua-Text?style=social" alt="GitHub stars">
 	</a>
-	<img src="https://img.shields.io/badge/coverage-85%25-yellow" alt="Coverage badge">
+	<img src="https://img.shields.io/badge/coverage-92%25-brightgreen" alt="Coverage badge">
 </div>
 <h1>Lingua::Text</h1><h2>Coverage Report</h2>
 <table data-sort-col="0" data-sort-order="asc" data-table-id="coverage">
@@ -158,9 +158,9 @@
 
 <tbody>
 
-<tr class="med"><td><a href="blib-lib-Lingua-Text-pm.html" title="View coverage line by line" target="_blank">lib/Lingua/Text.pm</a> <a href="https://github.com/nigelhorne/Lingua-Text/blob/dbc8bf4036d3931db577ad263f67317cfb09c1cf/lib/Lingua/Text.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="87.8,87.8,87.0"></canvas></td><td>90.7</td><td>74.0</td><td>73.1</td><td>100.0</td><td><span class="coverage-badge badge-warn" title="Moderate coverage">85.1%</span></td><td class="negative" title="Previous: 87.0%">&#9660; 1.9%</td></tr>
-<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">1 files</td><td colspan="3">Avg: 85%, Low: 0</td></tr>
-<tr class="high nosort"><td><strong>Total</strong></td><td>90.7</td><td>74.0</td><td>73.1</td><td>100.0</td><td colspan="2"><strong>85.1</strong></td></tr>
+<tr class="high"><td><a href="blib-lib-Lingua-Text-pm.html" title="View coverage line by line" target="_blank">lib/Lingua/Text.pm</a> <a href="https://github.com/nigelhorne/Lingua-Text/blob/55182fce1565853c5cf9593ab1c852ec1706f6a5/lib/Lingua/Text.pm" class="icon-link" title="View source on GitHub">&#128269;</a><canvas class="sparkline" width="80" height="20" data-points="87.8,87.8,87.0,85.1"></canvas></td><td>98.1</td><td>81.6</td><td>77.8</td><td>100.0</td><td><span class="coverage-badge badge-good" title="Excellent coverage">92.3%</span></td><td class="positive" title="Previous: 85.1%">&#9650; 7.1%</td></tr>
+<tr class="summary-row nosort"><td colspan="2"><strong>Summary</strong></td><td colspan="2">1 files</td><td colspan="3">Avg: 92%, Low: 0</td></tr>
+<tr class="high nosort"><td><strong>Total</strong></td><td>98.1</td><td>81.6</td><td>77.8</td><td>100.0</td><td colspan="2"><strong>92.3</strong></td></tr>
 </tbody></table>
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1em;">
 	<div>
@@ -209,8 +209,9 @@ function linearRegression(data) {
 
 const dataPoints = [ { x: "2026-08-19T08:43:33-04:00", y: 87.8306878306878, delta: 0, url: "https://github.com/nigelhorne/Lingua-Text/commit/f28142429ba77a8713cf4b5be179e11cf78f1a8b", label: "2026-08-19T08:43:33-04:00", pointBackgroundColor: "gray", comment: "Fix https://github.com/nigelhorne/Lingua-Text/issues/16" },
 { x: "2026-08-19T08:49:22-04:00", y: 87.8306878306878, delta: 0.0, url: "https://github.com/nigelhorne/Lingua-Text/commit/6da0764c229e8484a9fdb73461b08905dd88aa40", label: "2026-08-19T08:49:22-04:00", pointBackgroundColor: "gray", comment: "Updated Changes" },
-{ x: "2026-08-19T09:05:10-04:00", y: 43.5233160621761, delta: -44.3, url: "https://github.com/nigelhorne/Lingua-Text/commit/a390e01224a3606237b9b4944b51bc5b8ec32d19", label: "2026-08-19T09:05:10-04:00", pointBackgroundColor: "red", comment: "Support Object::Configure" },
-{ x: "2026-08-19T13:30:27+00:00", y: 85.1485148514851, delta: 41.6, url: "https://github.com/nigelhorne/Lingua-Text/commit/dbc8bf4036d3931db577ad263f67317cfb09c1cf", label: "2026-08-19T13:30:27+00:00", pointBackgroundColor: "green", comment: "comments" } ];
+{ x: "2026-08-19T09:05:10-04:00", y: 87.0466321243523, delta: -0.8, url: "https://github.com/nigelhorne/Lingua-Text/commit/a390e01224a3606237b9b4944b51bc5b8ec32d19", label: "2026-08-19T09:05:10-04:00", pointBackgroundColor: "red", comment: "Support Object::Configure" },
+{ x: "2026-08-19T09:27:09-04:00", y: 42.5742574257426, delta: -44.5, url: "https://github.com/nigelhorne/Lingua-Text/commit/dbc8bf4036d3931db577ad263f67317cfb09c1cf", label: "2026-08-19T09:27:09-04:00", pointBackgroundColor: "red", comment: "comments" },
+{ x: "2026-08-19T14:01:41+00:00", y: 92.2680412371134, delta: 49.7, url: "https://github.com/nigelhorne/Lingua-Text/commit/55182fce1565853c5cf9593ab1c852ec1706f6a5", label: "2026-08-19T14:01:41+00:00", pointBackgroundColor: "green", comment: "Added locales.t" } ];
 const regressionPoints = linearRegression(dataPoints);
 // Try to register the zoom plugin (handles different UMD builds)
 (function registerZoomPlugin(){
@@ -765,52 +766,52 @@ document.addEventListener("DOMContentLoaded", function () {
 </thead>
 <tbody>
 
-<tr class="cpan-fail"><td>2026-07-06T20:11:00Z</td><td>linux</td><td>5.40.3</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/f085a7f4-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:11:00Z</td><td>linux</td><td>5.38.5</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/e3bde914-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-04T22:42:00Z</td><td>linux</td><td>5.44.0 RC1</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/92f06986-77f9-11f1-b73a-21df6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-08-16T01:43:00Z</td><td>linux</td><td>5.42.3</td><td>Andreas J. K&ouml;nig (ANDK)</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/d09ebdec-9913-11f1-aae6-966d56c39a8a" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-11T07:29:00Z</td><td>freebsd</td><td>5.42.2</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/3b17a7fa-7cfa-11f1-beb4-d31c6e8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:12:00Z</td><td>linux</td><td>5.36.3</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/f531346c-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:08:00Z</td><td>linux</td><td>5.36.3</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/85a1f7f8-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-06T20:10:00Z</td><td>linux</td><td>5.42.0</td><td>Slaven Rezi&#x107;</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/cd8783e4-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:07:00Z</td><td>freebsd</td><td>5.44.0 RC1</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/4450a042-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-08-04T00:31:00Z</td><td>linux</td><td>5.42.3 RC1</td><td>Andreas J. K&ouml;nig (ANDK)</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/d793d564-8f9b-11f1-9675-cf404ec4ff36" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-06T20:08:00Z</td><td>linux</td><td>5.38.2</td><td>Slaven Rezi&#x107;</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/641e9848-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:08:00Z</td><td>linux</td><td>5.40.0</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/769b47b4-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:07:00Z</td><td>freebsd</td><td>5.44.0 RC1</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/4450a042-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-06T20:11:00Z</td><td>linux</td><td>5.43.11</td><td>Slaven Rezi&#x107;</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/d9749a0c-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:10:00Z</td><td>linux</td><td>5.32.1</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/c3a182a8-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:09:00Z</td><td>freebsd</td><td>5.38.5</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/a141dffa-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:05:00Z</td><td>freebsd</td><td>5.40.3</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/12f943e6-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
-<tr class="cpan-fail"><td>2026-07-06T20:09:00Z</td><td>freebsd</td><td>5.30.3</td><td>Slaven Rezi&#x107;</td><td></td>
-				<td><a href="https://www.cpantesters.org/cpan/report/95a57472-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-06T20:10:00Z</td><td>freebsd</td><td>5.40.4</td><td>Slaven Rezi&#x107;</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/afd0e64c-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:11:00Z</td><td>linux</td><td>5.40.3</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/f085a7f4-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:08:00Z</td><td>linux</td><td>5.36.3</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/85a1f7f8-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-11T07:29:00Z</td><td>freebsd</td><td>5.42.2</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/3b17a7fa-7cfa-11f1-beb4-d31c6e8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:10:00Z</td><td>linux</td><td>5.32.1</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/c3a182a8-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-08-16T01:43:00Z</td><td>linux</td><td>5.42.3</td><td>Andreas J. K&ouml;nig (ANDK)</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/d09ebdec-9913-11f1-aae6-966d56c39a8a" target="_blank">View</a></td><td></td></tr>
 <tr class="cpan-fail"><td>2026-07-06T20:10:00Z</td><td>freebsd</td><td>5.43.11</td><td>Slaven Rezi&#x107;</td><td></td>
 				<td><a href="https://www.cpantesters.org/cpan/report/bbb862be-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:09:00Z</td><td>freebsd</td><td>5.38.5</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/a141dffa-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:09:00Z</td><td>freebsd</td><td>5.30.3</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/95a57472-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:08:00Z</td><td>linux</td><td>5.40.0</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/769b47b4-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:12:00Z</td><td>linux</td><td>5.36.3</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/f531346c-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:05:00Z</td><td>freebsd</td><td>5.40.3</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/12f943e6-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-04T22:42:00Z</td><td>linux</td><td>5.44.0 RC1</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/92f06986-77f9-11f1-b73a-21df6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-07-06T20:11:00Z</td><td>linux</td><td>5.38.5</td><td>Slaven Rezi&#x107;</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/e3bde914-7976-11f1-a419-3fea6d8775ea" target="_blank">View</a></td><td></td></tr>
+<tr class="cpan-fail"><td>2026-08-04T00:31:00Z</td><td>linux</td><td>5.42.3 RC1</td><td>Andreas J. K&ouml;nig (ANDK)</td><td></td>
+				<td><a href="https://www.cpantesters.org/cpan/report/d793d564-8f9b-11f1-9675-cf404ec4ff36" target="_blank">View</a></td><td></td></tr>
 </tbody></table>
 <h2>Mutation Report</h2>
 <h3>Mutation Summary</h3>
 <ul>
-<li><b>Score</b>: 73.17%</li>
-<li><b>Total</b>: 41</li>
+<li><b>Score</b>: 72.50%</li>
+<li><b>Total</b>: 40</li>
 <li><b>Killed</b>: 
-30
+29
 </li>
 <li><b>Survived</b>: 
 11
@@ -836,22 +837,22 @@ document.addEventListener("DOMContentLoaded", function () {
 </thead>
 <tbody>
 
-<tr class="med"><td><a href="mutation_html/lib/Lingua/Text.pm.html" title="View mutation line by line" target="_blank">lib/Lingua/Text.pm</a> <a href="https://github.com/nigelhorne/Lingua-Text/blob/dbc8bf4036d3931db577ad263f67317cfb09c1cf/lib/Lingua/Text.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>41</td><td>30</td><td>11</td><td>0</td><td><span class="coverage-badge badge-warn" title="Moderate">73.2%</span></td><td><span class="coverage-badge badge-good" title="Good">36</span></td><td><span class="coverage-badge badge-good" title="Excellent">90.7%</span> / <span class="coverage-badge badge-warn" title="Moderate">74.0%</span> / <span class="coverage-badge badge-good" title="Excellent">100.0%</span></td><td><span class="coverage-badge badge-good" title="Low duplication">0.0%</span></td></tr>
+<tr class="med"><td><a href="mutation_html/lib/Lingua/Text.pm.html" title="View mutation line by line" target="_blank">lib/Lingua/Text.pm</a> <a href="https://github.com/nigelhorne/Lingua-Text/blob/55182fce1565853c5cf9593ab1c852ec1706f6a5/lib/Lingua/Text.pm" class="icon-link" title="View source on GitHub">&#128269;</a></td><td>40</td><td>29</td><td>11</td><td>0</td><td><span class="coverage-badge badge-warn" title="Moderate">72.5%</span></td><td><span class="coverage-badge badge-good" title="Good">36</span></td><td><span class="coverage-badge badge-good" title="Excellent">98.1%</span> / <span class="coverage-badge badge-warn" title="Moderate">81.6%</span> / <span class="coverage-badge badge-good" title="Excellent">100.0%</span></td><td><span class="coverage-badge badge-good" title="Low duplication">0.0%</span></td></tr>
 </tbody></table>
 
 <h2>Structural Coverage (Approximate)</h2>
 <div class='summary'>
-Statement Coverage: 90.74% (98 / 108)<br>
-Branch Coverage: 74.00% (37 / 50)<br>
+Statement Coverage: 98.11% (104 / 106)<br>
+Branch Coverage: 81.58% (31 / 38)<br>
 <em>Approximate LCSAJ derived from branch and statement coverage.</em>
 </div>
 <h2>Executive Summary</h2>
 <div class='summary'>
-Tests execute 90.74% of the code but detect only 73.17% of injected faults.
+Tests execute 98.11% of the code but detect only 72.50% of injected faults.
 </div>
 <footer>
 	<p>Project: <a href="https://github.com/nigelhorne/Lingua-Text">Lingua-Text</a></p>
-	<p><em>Last updated: 2026-08-19 13:29:34 - <a href="https://github.com/nigelhorne/Lingua-Text/commit/dbc8bf4036d3931db577ad263f67317cfb09c1cf">commit <code>dbc8bf4</code></a></em></p>
+	<p><em>Last updated: 2026-08-19 14:01:06 - <a href="https://github.com/nigelhorne/Lingua-Text/commit/55182fce1565853c5cf9593ab1c852ec1706f6a5">commit <code>55182fc</code></a></em></p>
 	<p style="float: right; font-size: 0.85em; color: #999;">Powered by <a href="https://metacpan.org/dist/App-Test-Generator">App::Test::Generator 0.46</a></p>
 </footer>
 </body>
