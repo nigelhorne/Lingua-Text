@@ -25,11 +25,11 @@ Lingua::Text - Store the same text in many languages; retrieve it in the user's 
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our $AUTOLOAD;
 
 # ---------------------------------------------------------------------------
@@ -38,7 +38,13 @@ our $AUTOLOAD;
 
 # ISO 639-1 language code with optional ISO 3166-1 country suffix (e.g. 'en', 'en_US').
 # The pattern is case-sensitive: lower-case lang, upper-case country.
-Readonly::Scalar my $LANG_RE => qr/^[a-z]{2}(?:_[A-Z]{2})?$/;
+# /x lets us annotate each component; spaces and # comments inside /x are ignored.
+Readonly::Scalar my $LANG_RE => qr/
+	^
+	[a-z]{2}          # ISO 639-1 two-letter language code (e.g. 'en', 'fr')
+	(?:_[A-Z]{2})?    # optional ISO 3166-1 country suffix (e.g. '_US', '_GB')
+	$
+/x;
 
 # Error message catalog.  All templates accept the package name as first
 # sprintf argument so callers never hard-code the package string.
@@ -759,7 +765,7 @@ for guidance on typo detection.
 sub AUTOLOAD {
 	my $self = shift or return;
 
-	my ($key) = $AUTOLOAD =~ /::(\w+)$/;
+	my ($key) = $AUTOLOAD =~ /::(\w+)\z/;
 
 	return if $key eq 'DESTROY';
 	return unless ref($self) eq __PACKAGE__;
@@ -850,24 +856,31 @@ sub _carp_set_usage :Private {
 		}
 
 		# Slow path: probe the environment.
+		# Each /^[a-z]{2}/i check uses substr() to extract the code rather than a
+		# capturing group, avoiding $1 allocation for a fixed-width 2-char prefix.
 		my $lang;
 		for my $tag (I18N::LangTags::Detect::detect()) {
-			if($tag =~ /^([a-z]{2})/i) { $lang = lc($1); last }
+			if($tag =~ /^[a-z]{2}/i) { $lang = lc(substr($tag, 0, 2)); last }
 		}
-		if(!defined($lang) && ($ENV{'LANGUAGE'} // '') =~ /^([a-z]{2})/i) {
-			$lang = lc($1);
+		if(!defined($lang)) {
+			my $language_env = $ENV{'LANGUAGE'} // '';
+			if($language_env =~ /^[a-z]{2}/i) {
+				$lang = lc(substr($language_env, 0, 2));
+			}
 		}
 		if(!defined($lang)) {
 			for my $var ('LC_ALL', 'LC_MESSAGES', 'LANG') {
 				my $val = $ENV{$var} // next;
-				if($val =~ /^([a-z]{2})/i) {
-					my $code = lc($1);
+				if($val =~ /^[a-z]{2}/i) {
+					my $code = lc(substr($val, 0, 2));
 					if(_is_valid_language($code)) { $lang = $code; last }
 				}
 			}
 		}
-		# POSIX 'C' locale is treated as English
-		$lang //= 'en' if ($ENV{'LANG'} // '') =~ /^C(\.|$)/;
+		# POSIX 'C' locale is treated as English.
+		# (?:\z|\.) matches 'C' at end-of-string or 'C.' (e.g. 'C.UTF-8').
+		# Non-capturing group: the dot is tested but its value is never needed.
+		$lang //= 'en' if ($ENV{'LANG'} // '') =~ /^C(?:\z|\.)/;
 
 		# Cache result and snapshot the five vars we check.
 		$cached_lang    = $lang;

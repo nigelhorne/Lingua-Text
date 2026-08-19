@@ -39,7 +39,8 @@ WriteMakefile(
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::NoWarnings' => 0
+		'Test::NoWarnings' => 0,
+		'Test::Returns' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'Lingua-Text-*' },
 	# META_ADD => {
