@@ -4,7 +4,7 @@ requires 'perl', '5.6.2';
 
 requires 'Carp';
 requires 'Exporter';
-requires 'ExtUtils::MakeMaker', '6.64';
+requires 'ExtUtils::MakeMaker', '6.64';   # 6.64 for TEST_REQUIRES
 requires 'HTML::Entities';
 requires 'I18N::LangTags::Detect';
 requires 'Params::Get';
