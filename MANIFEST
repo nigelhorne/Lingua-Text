@@ -29,4 +29,5 @@ t/pod.t
 t/port.t
 t/strict.t
 t/text.t
+t/unit.t
 t/vars.t

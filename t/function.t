@@ -803,7 +803,7 @@ subtest 'memory -- no circular references' => sub {
 	}
 	{
 		local %ENV;
-		my $t = Lingua::Text->new();
+		my $t = new_ok('Lingua::Text');
 		$t->set(text => $EN_TEXT, lang => $LANG{en});
 		$t->set(text => $FR_TEXT, lang => $LANG{fr});
 		memory_cycle_ok($t, 'no cycle after multiple set() calls');
