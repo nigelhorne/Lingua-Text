@@ -1,0 +1,316 @@
+{
+   "runs" : [
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143578.43807,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "-e",
+         "start" : 1787143574.60294,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143574.70914,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "-e",
+         "start" : 1787143574.70906,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143574.90913,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/00-load.t",
+         "start" : 1787143574.90826,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143575.13218,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/10-new.t",
+         "start" : 1787143575.13127,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143575.36831,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/30-basics.t",
+         "start" : 1787143575.3649,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143575.59387,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/carp.t",
+         "start" : 1787143575.59178,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143575.79124,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/comment-spelling.t",
+         "start" : 1787143575.79107,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143575.95495,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/eof.t",
+         "start" : 1787143575.95476,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.12295,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/eol.t",
+         "start" : 1787143576.12277,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.28692,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/links.t",
+         "start" : 1787143576.28675,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.45313,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/manifest.t",
+         "start" : 1787143576.45295,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.61728,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/no404s.t",
+         "start" : 1787143576.61709,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.78199,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod-cm.t",
+         "start" : 1787143576.78182,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143576.9641,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod-coverage.t",
+         "start" : 1787143576.96388,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143577.15125,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod-snippets.t",
+         "start" : 1787143577.15104,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143577.31965,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod-spelling.t",
+         "start" : 1787143577.31947,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143577.48567,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod-synopsis.t",
+         "start" : 1787143577.48548,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143577.65253,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/pod.t",
+         "start" : 1787143577.65232,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143577.83908,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/port.t",
+         "start" : 1787143577.83889,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143578.01393,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/strict.t",
+         "start" : 1787143578.01376,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143578.21387,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/text.t",
+         "start" : 1787143578.20676,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Class to contain text in many different languages",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787143578.41138,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/vars.t",
+         "start" : 1787143578.4112,
+         "version" : "0.08"
+      }
+   ],
+   "summary" : {
+      "Total" : {
+         "branch" : {
+            "covered" : 43,
+            "error" : 11,
+            "percentage" : 79.6296296296296,
+            "total" : 54,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 14,
+            "error" : 4,
+            "percentage" : 77.7777777777778,
+            "total" : 18,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 93,
+            "error" : 8,
+            "percentage" : 92.0792079207921,
+            "total" : 101
+         },
+         "subroutine" : {
+            "covered" : 16,
+            "percentage" : 100,
+            "total" : 16
+         },
+         "total" : {
+            "covered" : 166,
+            "error" : 23,
+            "percentage" : 87.8306878306878,
+            "total" : 189,
+            "uncoverable" : 0
+         }
+      },
+      "blib/lib/Lingua/Text.pm" : {
+         "branch" : {
+            "covered" : 43,
+            "error" : 11,
+            "percentage" : 79.6296296296296,
+            "total" : 54,
+            "uncoverable" : 0
+         },
+         "condition" : {
+            "covered" : 14,
+            "error" : 4,
+            "percentage" : 77.7777777777778,
+            "total" : 18,
+            "uncoverable" : 0
+         },
+         "statement" : {
+            "covered" : 93,
+            "error" : 8,
+            "percentage" : 92.0792079207921,
+            "total" : 101
+         },
+         "subroutine" : {
+            "covered" : 16,
+            "percentage" : 100,
+            "total" : 16
+         },
+         "total" : {
+            "covered" : 166,
+            "error" : 23,
+            "percentage" : 87.8306878306878,
+            "total" : 189,
+            "uncoverable" : 0
+         }
+      }
+   }
+}
