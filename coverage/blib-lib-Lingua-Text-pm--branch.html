@@ -20,35 +20,36 @@ https://pjcj.net
 <h1>Branch Coverage</h1>
 <table>
 <tr><td class="h" align="right">File:</td><td align="left">blib/lib/Lingua/Text.pm</td></tr>
-<tr><td class="h" align="right">Coverage:</td><td align="left" class="c1">89.6%</td></tr>
+<tr><td class="h" align="right">Coverage:</td><td align="left" class="c2">92.0%</td></tr>
 </table>
 <div><br/></div>
 <table>
 <tr><th>line</th><th>%</th><th colspan="2">coverage</th><th>branch</th></tr>
 <tr><td class="h"><a id="L294">294</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless ($is_object or $is_class)</td></tr>
 <tr><td class="h"><a id="L296">296</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $class)</td></tr>
-<tr><td class="h"><a id="L305">305</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar @_ == 1 and not ref $_[0] and my $lang = _get_language()) { }</td></tr>
+<tr><td class="h"><a id="L309">309</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (scalar @_ == 1 and not ref $_[0]) { }</td></tr>
 <tr><td class="h"></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">elsif (@_) { }</td></tr>
-<tr><td class="h"><a id="L312">312</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_object)</td></tr>
-<tr><td class="h"><a id="L313">313</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($params)</td></tr>
-<tr><td class="h"><a id="L321">321</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">$params ? :</td></tr>
-<tr><td class="h"><a id="L415">415</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless @_</td></tr>
-<tr><td class="h"><a id="L423">423</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $lang</td></tr>
-<tr><td class="h"><a id="L430">430</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless _is_valid_language($lang)</td></tr>
-<tr><td class="h"><a id="L433">433</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $text</td></tr>
-<tr><td class="h"><a id="L538">538</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_ and defined $_[0])</td></tr>
-<tr><td class="h"><a id="L539">539</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_ == 1 and not ref $_[0]) { }</td></tr>
-<tr><td class="h"><a id="L548">548</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $lang)</td></tr>
-<tr><td class="h"><a id="L615">615</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless _is_valid_language($lang)</td></tr>
-<tr><td class="h"><a id="L623">623</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless defined $v and not ref $v</td></tr>
-<tr><td class="h"><a id="L625">625</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless utf8::is_utf8($v)</td></tr>
-<tr><td class="h"><a id="L709">709</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
-<tr><td class="h"><a id="L713">713</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $key eq &quot;DESTROY&quot;</td></tr>
-<tr><td class="h"><a id="L714">714</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__</td></tr>
-<tr><td class="h"><a id="L723">723</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $key =~ /^[a-z]{2}$/</td></tr>
-<tr><td class="h"><a id="L733">733</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $s = shift()</td></tr>
-<tr><td class="h"><a id="L734">734</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if @_</td></tr>
-<tr><td class="h"><a id="L740">740</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_)</td></tr>
+<tr><td class="h"><a id="L311">311</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $lang</td></tr>
+<tr><td class="h"><a id="L317">317</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($is_object)</td></tr>
+<tr><td class="h"><a id="L318">318</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if ($params)</td></tr>
+<tr><td class="h"><a id="L326">326</a></td><td class="c0">50</td><td class="c3">T</td><td class="c0">F</td><td class="s">$params ? :</td></tr>
+<tr><td class="h"><a id="L420">420</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless @_</td></tr>
+<tr><td class="h"><a id="L428">428</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $lang</td></tr>
+<tr><td class="h"><a id="L435">435</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless _is_valid_language($lang)</td></tr>
+<tr><td class="h"><a id="L438">438</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $text</td></tr>
+<tr><td class="h"><a id="L543">543</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_ and defined $_[0])</td></tr>
+<tr><td class="h"><a id="L544">544</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_ == 1 and not ref $_[0]) { }</td></tr>
+<tr><td class="h"><a id="L553">553</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (defined $lang)</td></tr>
+<tr><td class="h"><a id="L620">620</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless _is_valid_language($lang)</td></tr>
+<tr><td class="h"><a id="L628">628</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless defined $v and not ref $v</td></tr>
+<tr><td class="h"><a id="L630">630</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless utf8::is_utf8($v)</td></tr>
+<tr><td class="h"><a id="L714">714</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $self = shift()</td></tr>
+<tr><td class="h"><a id="L718">718</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if $key eq &quot;DESTROY&quot;</td></tr>
+<tr><td class="h"><a id="L719">719</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless ref $self eq __PACKAGE__</td></tr>
+<tr><td class="h"><a id="L728">728</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">unless $key =~ /^[a-z]{2}$/</td></tr>
+<tr><td class="h"><a id="L738">738</a></td><td class="c0">50</td><td class="c0">T</td><td class="c3">F</td><td class="s">unless my $s = shift()</td></tr>
+<tr><td class="h"><a id="L739">739</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if @_</td></tr>
+<tr><td class="h"><a id="L745">745</a></td><td class="c3">100</td><td class="c3">T</td><td class="c3">F</td><td class="s">if (@_)</td></tr>
 </table>
 </body>
 </html>
