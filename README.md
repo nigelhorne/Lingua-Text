@@ -37,7 +37,7 @@ Create a Lingua::Text object.
 
     my $str = Lingua::Text->new({ 'en' => 'Here', 'fr' => 'Ici' });
 
-Accepts various input formats, e.g. HASH or reference to a HASH.
+Accepts various input formats, e.g., HASH or reference to a HASH.
 Clones existing objects with or without modifications.
 Uses Carp::carp to log warnings for incorrect usage or potential mistakes.
 
@@ -65,7 +65,7 @@ If that parameter is not given, the system language is used.
 
 Turns the encapsulated texts into HTML entities
 
-    my $text = Lingua::Text->new(en => 'study', fr => 'étude')->encode();
+    my $text = Lingua::Text->new(en => 'study', fr => 'etude')->encode();
     print $text->fr(), "\n";    # Prints &eacute;tude
 
 # AUTHOR
@@ -78,6 +78,9 @@ There's no decode() (yet),
 so you'll have to be extra careful to avoid double encoding.
 
 # SEE ALSO
+
+- [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
+- [Test Dashboard](https://nigelhorne.github.io/CGI-Info/coverage/)
 
 # SUPPORT
 
@@ -111,9 +114,8 @@ You can also look for information at:
 
 # LICENCE AND COPYRIGHT
 
-Copyright 2021-2025 Nigel Horne.
+Copyright 2021-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2 for personal use on
-a single computer.
-All other users (for example, Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at \`&lt;njh at nigelhorne.com>\`.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
