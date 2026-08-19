@@ -11,10 +11,15 @@ requires 'Object::Configure';
 requires 'Params::Get';
 requires 'Scalar::Util';
 
+on 'configure' => sub {
+	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
+};
+
 on 'test' => sub {
 	requires 'IPC::System::Simple';
 	requires 'Test::Carp';
 	requires 'Test::DescribeMe';
+	requires 'Test::Memory::Cycle';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::NoWarnings';
