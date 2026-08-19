@@ -58,71 +58,6 @@ use overload (
 );
 
 # ---------------------------------------------------------------------------
-# Private helpers
-# ---------------------------------------------------------------------------
-
-# Purpose:  Format a message from the catalog with the package name filled in.
-# Entry:    $key -- key into %MESSAGES.
-# Exit:     Formatted string ready for Carp.
-# Effects:  None.
-sub _err :Private {
-	my ($key) = @_;
-	return sprintf($MESSAGES{$key} // "Unknown internal error: $key", __PACKAGE__);
-}
-
-# Purpose:  Issue a carp warning for a set() usage mistake and return undef.
-#           Extracted to eliminate the duplicated carp + return pattern in set().
-# Entry:    None (uses package-level _err).
-# Exit:     undef.
-# Effects:  Emits a Carp warning visible at the caller's call site.
-sub _carp_set_usage :Private {
-	Carp::carp(_err('set_usage'));
-	return;
-}
-
-# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
-# https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
-#
-# Purpose:  Determine the two-letter ISO 639-1 language code for the running
-#           environment by probing standard locale environment variables in
-#           precedence order.
-# Entry:    Environment variables: LANGUAGE, LC_ALL, LC_MESSAGES, LANG.
-# Exit:     Lower-case two-letter code (e.g. 'en', 'fr'), or undef if the
-#           locale is absent, empty, or set to the POSIX 'C' locale.
-#           Returns 'en' when LANG=C or LANG=C.<encoding>.
-# Effects:  Read-only; no side-effects on the environment.
-sub _get_language :Private {
-	for my $tag (I18N::LangTags::Detect::detect()) {
-		return lc($1) if $tag =~ /^([a-z]{2})/i;
-	}
-
-	return lc($1)
-		if ($ENV{'LANGUAGE'} // '') =~ /^([a-z]{2})/i;
-
-	for my $var ('LC_ALL', 'LC_MESSAGES', 'LANG') {
-		my $val = $ENV{$var} // next;
-		if($val =~ /^([a-z]{2})/i) {
-			my $code = lc($1);
-			return $code if _is_valid_language($code);
-		}
-	}
-
-	# POSIX 'C' locale is treated as English
-	return 'en' if ($ENV{'LANG'} // '') =~ /^C(\.|$)/;
-	return;
-}
-
-# Purpose:  Validate that a string is a well-formed language code accepted by
-#           this module (ISO 639-1 with optional ISO 3166-1 country suffix).
-# Entry:    $lang -- candidate string.
-# Exit:     True if $lang matches $LANG_RE; false otherwise.
-# Effects:  None.
-sub _is_valid_language :Private {
-	my ($lang) = @_;
-	return $lang =~ $LANG_RE;
-}
-
-# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -647,10 +582,16 @@ sub as_string {
 
 	# Guard against the overload calling convention: Perl passes ($self, $other, $swap)
 	# when the "" handler is invoked during a comparison.  We only want the first arg.
+	# Fast path: single positional scalar (e.g. as_string('en')) skips Params::Get
+	# to avoid parameter-parsing overhead on what is often the hottest call site.
 	my $lang;
 	if(@_ && defined($_[0])) {
-		my $params = Params::Get::get_params('lang', @_);
-		$lang = $params && $params->{'lang'};
+		if(@_ == 1 && !ref($_[0])) {
+			$lang = $_[0];    # positional form: as_string('en') or as_string('en_GB')
+		} else {
+			my $params = Params::Get::get_params('lang', @_);
+			$lang = $params && $params->{'lang'};
+		}
 	}
 	$lang //= _get_language();
 
@@ -832,12 +773,116 @@ sub AUTOLOAD {
 	#     and is removed.  The i-flag is also dropped to make the check strict.
 	return unless $key =~ /^[a-z]{2}$/;
 
+	# Install a real method for $key so all future calls bypass AUTOLOAD entirely.
+	# Each two-letter code gets its own closure installed exactly once.  This
+	# reduces repeated accessor cost from AUTOLOAD overhead (~5 regex ops) to a
+	# direct method dispatch, which is the dominant cost when rendering a page
+	# that stringifies many objects through the same language code.
+	{
+		no strict 'refs';
+		*{__PACKAGE__ . '::' . $key} = sub {
+			my $s = shift or return;
+			$s->{'texts'}->{$key} = shift if @_;
+			return $s->{'texts'}->{$key};
+		};
+	}
+
 	# Use @_ presence (not truthiness) so falsy values like '0' or '' are stored
 	if(@_) {
 		$self->{'texts'}->{$key} = shift;
 	}
 
 	return $self->{'texts'}->{$key};
+}
+
+# ---------------------------------------------------------------------------
+# Private helpers
+# ---------------------------------------------------------------------------
+
+# Purpose:  Format a message from the catalog with the package name filled in.
+# Entry:    $key -- key into %MESSAGES.
+# Exit:     Formatted string ready for Carp.
+# Effects:  None.
+sub _err :Private {
+	my ($key) = @_;
+	return sprintf($MESSAGES{$key} // "Unknown internal error: $key", __PACKAGE__);
+}
+
+# Purpose:  Issue a carp warning for a set() usage mistake and return undef.
+#           Extracted to eliminate the duplicated carp + return pattern in set().
+# Entry:    None (uses package-level _err).
+# Exit:     undef.
+# Effects:  Emits a Carp warning visible at the caller's call site.
+sub _carp_set_usage :Private {
+	Carp::carp(_err('set_usage'));
+	return;
+}
+
+# https://www.gnu.org/software/gettext/manual/html_node/Locale-Environment-Variables.html
+# https://www.gnu.org/software/gettext/manual/html_node/The-LANGUAGE-variable.html
+#
+# Purpose:  Determine the two-letter ISO 639-1 language code for the running
+#           environment by probing standard locale environment variables in
+#           precedence order.
+# Entry:    Environment variables: LANGUAGE, LC_ALL, LC_MESSAGES, LANG.
+# Exit:     Lower-case two-letter code (e.g. 'en', 'fr'), or undef if the
+#           locale is absent, empty, or set to the POSIX 'C' locale.
+#           Returns 'en' when LANG=C or LANG=C.<encoding>.
+# Effects:  Read-only.  The result is memoised against an env-var snapshot so
+#           repeated calls within the same process incur only five string
+#           comparisons rather than a full I18N::LangTags::Detect scan.
+#           The cache is invalidated automatically whenever LANGUAGE, LC_ALL,
+#           LC_MESSAGES, LANG, or HTTP_ACCEPT_LANGUAGE changes (e.g. local %ENV
+#           in tests).
+{
+	my ($cached_lang, %cached_env);
+
+	sub _get_language :Private {
+		# Fast path: env vars unchanged since last call -- return cached result.
+		# Using 'exists' rather than defined($cached_lang) so a cached undef is
+		# also served from cache (avoids re-probing an env with no locale set).
+		if(exists $cached_env{LANG}) {
+			my $stale = 0;
+			for my $v (qw(LANGUAGE LC_ALL LC_MESSAGES LANG HTTP_ACCEPT_LANGUAGE)) {
+				if(($ENV{$v} // '') ne $cached_env{$v}) { $stale = 1; last }
+			}
+			return $cached_lang unless $stale;
+		}
+
+		# Slow path: probe the environment.
+		my $lang;
+		for my $tag (I18N::LangTags::Detect::detect()) {
+			if($tag =~ /^([a-z]{2})/i) { $lang = lc($1); last }
+		}
+		if(!defined($lang) && ($ENV{'LANGUAGE'} // '') =~ /^([a-z]{2})/i) {
+			$lang = lc($1);
+		}
+		if(!defined($lang)) {
+			for my $var ('LC_ALL', 'LC_MESSAGES', 'LANG') {
+				my $val = $ENV{$var} // next;
+				if($val =~ /^([a-z]{2})/i) {
+					my $code = lc($1);
+					if(_is_valid_language($code)) { $lang = $code; last }
+				}
+			}
+		}
+		# POSIX 'C' locale is treated as English
+		$lang //= 'en' if ($ENV{'LANG'} // '') =~ /^C(\.|$)/;
+
+		# Cache result and snapshot the five vars we check.
+		$cached_lang    = $lang;
+		$cached_env{$_} = $ENV{$_} // '' for qw(LANGUAGE LC_ALL LC_MESSAGES LANG HTTP_ACCEPT_LANGUAGE);
+		return $lang;
+	}
+}
+
+# Purpose:  Validate that a string is a well-formed language code accepted by
+#           this module (ISO 639-1 with optional ISO 3166-1 country suffix).
+# Entry:    $lang -- candidate string.
+# Exit:     True if $lang matches $LANG_RE; false otherwise.
+sub _is_valid_language :Private {
+	my ($lang) = @_;
+	return $lang =~ $LANG_RE;
 }
 
 =head1 COMMON PITFALLS
@@ -946,6 +991,39 @@ double-colon and arguments) will emit a warning and return C<undef>.
 
 Calling C<Lingua::Text::new()> with B<no> arguments works (it creates an empty
 object), but the arrow form is still preferred.
+
+=head1 PERFORMANCE
+
+Three optimisations address the hot paths in typical web or CGI use (many
+objects stringified per request, same accessor called repeatedly):
+
+=over 4
+
+=item B<Memoised locale detection>
+
+C<_get_language()> is called on every C<as_string()> invocation (including
+stringify via C<"">).  The result is cached against a snapshot of the five
+relevant environment variables (C<LANGUAGE>, C<LC_ALL>, C<LC_MESSAGES>,
+C<LANG>, C<HTTP_ACCEPT_LANGUAGE>).  As long as those variables do not change,
+subsequent calls cost only five string comparisons instead of a full
+C<I18N::LangTags::Detect::detect()> scan.  The cache is invalidated
+automatically when any of those variables change -- including C<local %ENV>
+in tests.
+
+=item B<AUTOLOAD method installation>
+
+The first call to any two-letter accessor (e.g. C<$t-E<gt>en()>) installs a
+real subroutine in the package symbol table.  All subsequent calls for that
+code dispatch directly, bypassing the AUTOLOAD regex and guard overhead
+entirely.
+
+=item B<Single-argument fast path in as_string()>
+
+C<$t-E<gt>as_string('en')> skips C<Params::Get::get_params()> when exactly
+one non-reference argument is supplied.  Named (C<lang =E<gt> 'en'>) and
+hashref (C<{ lang =E<gt> 'en' }>) forms still go through the full parser.
+
+=back
 
 =head1 LIMITATIONS
 

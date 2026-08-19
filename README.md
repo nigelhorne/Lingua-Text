@@ -294,6 +294,7 @@ missing or when no language can be determined.
     on_success          => $self,    # the same Lingua::Text object
     on_no_args          => undef     # with croak (programmer error)
     on_missing_lang     => undef     # with carp
+    on_invalid_lang     => undef     # with carp (lang fails ISO 639-1 check)
     on_missing_text     => undef     # with carp
 
 ### MESSAGES
@@ -304,8 +305,10 @@ missing or when no language can be determined.
 
 - `"usage: set(text => $text, lang => $language)"`  \[carp\]
 
-    Either `text` is missing/undef, or `lang` is missing and no locale
-    environment variable is set.  Pass `lang` explicitly to resolve the latter.
+    One of three conditions: `text` is missing or undef; `lang` is missing and
+    no locale environment variable is set; or `lang` was supplied but fails the
+    ISO 639-1 validation check (e.g. a three-letter code like `'abc'`).
+    Pass `lang` as a two-letter code (e.g. `'en'`) to resolve all three.
 
 ### FORMAL SPECIFICATION
 
@@ -647,6 +650,35 @@ double-colon and arguments) will emit a warning and return `undef`.
 
 Calling `Lingua::Text::new()` with **no** arguments works (it creates an empty
 object), but the arrow form is still preferred.
+
+# PERFORMANCE
+
+Three optimisations address the hot paths in typical web or CGI use (many
+objects stringified per request, same accessor called repeatedly):
+
+- **Memoised locale detection**
+
+    `_get_language()` is called on every `as_string()` invocation (including
+    stringify via `""`).  The result is cached against a snapshot of the five
+    relevant environment variables (`LANGUAGE`, `LC_ALL`, `LC_MESSAGES`,
+    `LANG`, `HTTP_ACCEPT_LANGUAGE`).  As long as those variables do not change,
+    subsequent calls cost only five string comparisons instead of a full
+    `I18N::LangTags::Detect::detect()` scan.  The cache is invalidated
+    automatically when any of those variables change -- including `local %ENV`
+    in tests.
+
+- **AUTOLOAD method installation**
+
+    The first call to any two-letter accessor (e.g. `$t->en()`) installs a
+    real subroutine in the package symbol table.  All subsequent calls for that
+    code dispatch directly, bypassing the AUTOLOAD regex and guard overhead
+    entirely.
+
+- **Single-argument fast path in as\_string()**
+
+    `$t->as_string('en')` skips `Params::Get::get_params()` when exactly
+    one non-reference argument is supplied.  Named (`lang => 'en'`) and
+    hashref (`{ lang => 'en' }`) forms still go through the full parser.
 
 # LIMITATIONS
 
