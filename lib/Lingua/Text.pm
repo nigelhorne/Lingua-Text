@@ -45,10 +45,10 @@ Readonly::Scalar my $LANG_RE => qr/^[a-z]{2}(?:_[A-Z]{2})?$/;
 # Capitalised "Usage:" marks programmer errors (croak); lower-case marks
 # runtime warnings (carp) -- the carp.t suite relies on this distinction.
 Readonly::Hash my %MESSAGES => (
-    new_oo_style => '%s: use ->new() not ::new() to instantiate',
-    set_no_args  => '%s: Usage: set(text => $text, lang => $language)',
-    set_usage    => '%s: usage: set(text => $text, lang => $language)',
-    str_usage    => '%s: usage: as_string(lang => $language)',
+	new_oo_style => '%s: use ->new() not ::new() to instantiate',
+	set_no_args  => '%s: Usage: set(text => $text, lang => $language)',
+	set_usage    => '%s: usage: set(text => $text, lang => $language)',
+	str_usage    => '%s: usage: as_string(lang => $language)',
 );
 
 use overload (
@@ -372,8 +372,15 @@ sub new {
 	my $is_class  = !ref($class) && defined($class) && eval { $class->isa(__PACKAGE__) };
 	my $is_object = blessed($class);
 
-	if(!defined($class) || (!$is_class && !$is_object)) {
-		# undef invocant = bare Lingua::Text::new() call with no args -- allowed
+	# Syllogism:
+	# P1: A valid invocant is a blessed object (clone path) or a class name (isa check).
+	# P2: !defined($class) implies both $is_class and $is_object are false
+	#     (each requires defined($class) in their own derivation).
+	# Conclusion: De Morgan reduction -- the original
+	#   "!defined || (!class && !object)"
+	# is logically equivalent to "!($is_object || $is_class)".
+	unless($is_object || $is_class) {
+		# undef invocant = bare Lingua::Text::new() with no args -- allowed
 		if(defined($class)) {
 			Carp::carp(_err('new_oo_style'));
 			return;
@@ -471,6 +478,7 @@ missing or when no language can be determined.
     on_success          => $self,    # the same Lingua::Text object
     on_no_args          => undef     # with croak (programmer error)
     on_missing_lang     => undef     # with carp
+    on_invalid_lang     => undef     # with carp (lang fails ISO 639-1 check)
     on_missing_text     => undef     # with carp
 
 =head3 MESSAGES
@@ -483,8 +491,10 @@ C<set()> was called with no arguments at all.  Provide at least C<text>.
 
 =item C<"usage: set(text =E<gt> $text, lang =E<gt> $language)">  [carp]
 
-Either C<text> is missing/undef, or C<lang> is missing and no locale
-environment variable is set.  Pass C<lang> explicitly to resolve the latter.
+One of three conditions: C<text> is missing or undef; C<lang> is missing and
+no locale environment variable is set; or C<lang> was supplied but fails the
+ISO 639-1 validation check (e.g. a three-letter code like C<'abc'>).
+Pass C<lang> as a two-letter code (e.g. C<'en'>) to resolve all three.
 
 =back
 
@@ -511,6 +521,13 @@ sub set {
 
 	my $lang = $params->{'lang'} || _get_language();
 	return _carp_set_usage() unless defined($lang);
+
+	# Syllogism:
+	# P1 (object invariant): every key in $self->{texts} must satisfy $LANG_RE.
+	# P2: $lang was resolved from caller input -- it may be any string.
+	# Conclusion: validate at the API boundary before writing; reject here to
+	#             maintain the invariant rather than letting bad keys propagate.
+	return _carp_set_usage() unless _is_valid_language($lang);
 
 	my $text = $params->{'text'};
 	return _carp_set_usage() unless defined($text);
@@ -805,8 +822,15 @@ sub AUTOLOAD {
 
 	return if $key eq 'DESTROY';
 	return unless ref($self) eq __PACKAGE__;
-	return unless $key =~ /^[a-z]{2}$/i;
-	return unless _is_valid_language($key);
+	# Syllogism:
+	# P1: _is_valid_language accepts ^[a-z]{2}(?:_[A-Z]{2})?$ (case-sensitive).
+	# P2: AUTOLOAD method names are bare identifiers; the \w+ capture never
+	#     produces the _XX suffix, so the relevant subset is ^[a-z]{2}$.
+	# P3: Any key passing /^[a-z]{2}$/ (no i-flag) is exactly two lowercase
+	#     letters -- a strict subset of what _is_valid_language accepts.
+	# Conclusion: the _is_valid_language call is a tautology after the regex
+	#     and is removed.  The i-flag is also dropped to make the check strict.
+	return unless $key =~ /^[a-z]{2}$/;
 
 	# Use @_ presence (not truthiness) so falsy values like '0' or '' are stored
 	if(@_) {
