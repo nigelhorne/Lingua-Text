@@ -294,7 +294,7 @@ a.intra-dot:hover { color: #7700bb; }
 </div><div class='summary'>
 <strong>Structural Coverage (Approximate)</strong><p>
 TER1 (Statement): 100.00%<br>
-TER2 (Branch): 92.00%<br>
+TER2 (Branch): 94.00%<br>
 TER3 (LCSAJ): 100.0% (11/11)<br>
 Approximate LCSAJ segments: 51<br>
 </div>
@@ -774,7 +774,7 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  433: 	# || would silently substitute the system locale when the caller explicitly
 </span><span class="">  434: 	# passes lang =&gt; &#39;&#39; or lang =&gt; &#39;0&#39;, masking an invalid-argument error.
 </span><span class="">  435: 	my $lang = $params-&gt;{&#39;lang&#39;} // _get_language();
-</span><span class="survived-2 tooltip" data-tooltip="Boolean logic mutation survived. Add tests covering both true and false paths. Return value mutation survived. Add tests asserting exact return values.">  436: 	return _carp_set_usage() unless defined($lang);
+</span><span class="survived-2 tooltip" data-tooltip="Return value mutation survived. Add tests asserting exact return values. Boolean logic mutation survived. Add tests covering both true and false paths.">  436: 	return _carp_set_usage() unless defined($lang);
 </span>
 					<details class="mutant-details">
 					<summary>Mutants (Total: 2, Killed: 0, Survived: 2)</summary>
