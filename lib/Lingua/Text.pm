@@ -889,7 +889,13 @@ sub AUTOLOAD {
 sub _err :Private {
 	my ($key) = @_;
 	my $fmt = $MESSAGES{$key};
-	return defined($fmt) ? sprintf($fmt, __PACKAGE__) : "Unknown internal error: $key";
+	return sprintf($fmt, __PACKAGE__) if defined($fmt);
+	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+	# All current callers pass a hard-coded key that exists in %MESSAGES, so this
+	# branch is dead for every reachable path in the module.  It is retained as a
+	# defensive fallback in case a future caller introduces a new key without
+	# updating %MESSAGES, but it cannot be triggered by any existing code path.
+	return "Unknown internal error: $key";
 }
 
 # Purpose:  Issue a carp warning for a set() usage mistake and return undef.
