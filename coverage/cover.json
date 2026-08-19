@@ -4,252 +4,252 @@
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143892.83984,
+         "finish" : 1787144943.26231,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "-e",
-         "start" : 1787143887.47976,
+         "start" : 1787144937.35832,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143887.62456,
+         "finish" : 1787144937.50325,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "-e",
-         "start" : 1787143887.62445,
+         "start" : 1787144937.50309,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143887.90252,
+         "finish" : 1787144937.85481,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/00-load.t",
-         "start" : 1787143887.90137,
+         "start" : 1787144937.85338,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143888.22082,
+         "finish" : 1787144938.27861,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/10-new.t",
-         "start" : 1787143888.21955,
+         "start" : 1787144938.25,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143888.54875,
+         "finish" : 1787144938.71665,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/30-basics.t",
-         "start" : 1787143888.54424,
+         "start" : 1787144938.69019,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143888.86588,
+         "finish" : 1787144939.14872,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/carp.t",
-         "start" : 1787143888.86294,
+         "start" : 1787144939.11896,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143889.14505,
+         "finish" : 1787144939.44385,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/comment-spelling.t",
-         "start" : 1787143889.14478,
+         "start" : 1787144939.44355,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143889.37885,
+         "finish" : 1787144939.67618,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/eof.t",
-         "start" : 1787143889.37861,
+         "start" : 1787144939.67587,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143889.61274,
+         "finish" : 1787144939.91062,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/eol.t",
-         "start" : 1787143889.61247,
+         "start" : 1787144939.91029,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143889.84579,
+         "finish" : 1787144940.14278,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/links.t",
-         "start" : 1787143889.84554,
+         "start" : 1787144940.14248,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143890.07833,
+         "finish" : 1787144940.37437,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/manifest.t",
-         "start" : 1787143890.07803,
+         "start" : 1787144940.37403,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143890.314,
+         "finish" : 1787144940.61024,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/no404s.t",
-         "start" : 1787143890.31375,
+         "start" : 1787144940.60991,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143890.54664,
+         "finish" : 1787144940.84948,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-cm.t",
-         "start" : 1787143890.54639,
+         "start" : 1787144940.84913,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143890.7828,
+         "finish" : 1787144941.08629,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-coverage.t",
-         "start" : 1787143890.78255,
+         "start" : 1787144941.08598,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143891.01712,
+         "finish" : 1787144941.31874,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-snippets.t",
-         "start" : 1787143891.01687,
+         "start" : 1787144941.31843,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143891.2515,
+         "finish" : 1787144941.55365,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-spelling.t",
-         "start" : 1787143891.25122,
+         "start" : 1787144941.55332,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143891.48717,
+         "finish" : 1787144941.78661,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-synopsis.t",
-         "start" : 1787143891.48686,
+         "start" : 1787144941.78628,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143891.72133,
+         "finish" : 1787144942.01969,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod.t",
-         "start" : 1787143891.72104,
+         "start" : 1787144942.0194,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143891.9901,
+         "finish" : 1787144942.27783,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/port.t",
-         "start" : 1787143891.98982,
+         "start" : 1787144942.27751,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143892.23095,
+         "finish" : 1787144942.51821,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/strict.t",
-         "start" : 1787143892.23069,
+         "start" : 1787144942.51789,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143892.51533,
+         "finish" : 1787144942.91984,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/text.t",
-         "start" : 1787143892.50424,
+         "start" : 1787144942.87669,
          "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Class to contain text in many different languages",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787143892.79919,
+         "finish" : 1787144943.22352,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/vars.t",
-         "start" : 1787143892.79888,
+         "start" : 1787144943.22323,
          "version" : "0.08"
       }
    ],
    "summary" : {
       "Total" : {
          "branch" : {
-            "covered" : 43,
-            "error" : 11,
-            "percentage" : 79.6296296296296,
-            "total" : 54,
+            "covered" : 40,
+            "error" : 12,
+            "percentage" : 76.9230769230769,
+            "total" : 52,
             "uncoverable" : 0
          },
          "condition" : {
@@ -260,30 +260,30 @@
             "uncoverable" : 0
          },
          "statement" : {
-            "covered" : 93,
-            "error" : 8,
-            "percentage" : 92.0792079207921,
-            "total" : 101
+            "covered" : 97,
+            "error" : 9,
+            "percentage" : 91.5094339622642,
+            "total" : 106
          },
          "subroutine" : {
-            "covered" : 16,
+            "covered" : 17,
             "percentage" : 100,
-            "total" : 16
+            "total" : 17
          },
          "total" : {
-            "covered" : 166,
-            "error" : 23,
-            "percentage" : 87.8306878306878,
-            "total" : 189,
+            "covered" : 168,
+            "error" : 25,
+            "percentage" : 87.0466321243523,
+            "total" : 193,
             "uncoverable" : 0
          }
       },
       "blib/lib/Lingua/Text.pm" : {
          "branch" : {
-            "covered" : 43,
-            "error" : 11,
-            "percentage" : 79.6296296296296,
-            "total" : 54,
+            "covered" : 40,
+            "error" : 12,
+            "percentage" : 76.9230769230769,
+            "total" : 52,
             "uncoverable" : 0
          },
          "condition" : {
@@ -294,21 +294,21 @@
             "uncoverable" : 0
          },
          "statement" : {
-            "covered" : 93,
-            "error" : 8,
-            "percentage" : 92.0792079207921,
-            "total" : 101
+            "covered" : 97,
+            "error" : 9,
+            "percentage" : 91.5094339622642,
+            "total" : 106
          },
          "subroutine" : {
-            "covered" : 16,
+            "covered" : 17,
             "percentage" : 100,
-            "total" : 16
+            "total" : 17
          },
          "total" : {
-            "covered" : 166,
-            "error" : 23,
-            "percentage" : 87.8306878306878,
-            "total" : 189,
+            "covered" : 168,
+            "error" : 25,
+            "percentage" : 87.0466321243523,
+            "total" : 193,
             "uncoverable" : 0
          }
       }
