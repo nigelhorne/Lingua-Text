@@ -24,13 +24,7 @@ WriteMakefile(
 	'DEFINE' => '',	# e.g., '-DHAVE_SOMETHING'
 	'INC' => '',	# e.g., '-I/usr/include/other'
 	PL_FILES	=> {},
-	TEST_REQUIRES => {
-		'Test::Carp' => 0,
-		'Test::DescribeMe' => 0,
-		'Test::Most' => 0,
-		'Test::Needs' => 0,
-		'Test::NoWarnings' => 0
-	}, PREREQ_PM => {
+	PREREQ_PM => {
 		'Carp' => 0,
 		'Exporter' => 0,
 		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
@@ -38,6 +32,13 @@ WriteMakefile(
 		'I18N::LangTags::Detect' => 0,
 		'Params::Get' => 0,
 		'Scalar::Util' => 0
+	}, TEST_REQUIRES => {
+		'IPC::System::Simple' => 0,
+		'Test::Carp' => 0,
+		'Test::DescribeMe' => 0,
+		'Test::Most' => 0,
+		'Test::Needs' => 0,
+		'Test::NoWarnings' => 0
 	}, dist => $dist,
 	clean		=> { FILES => 'Lingua-Text-*' },
 	# META_ADD => {

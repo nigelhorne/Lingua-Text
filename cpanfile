@@ -11,6 +11,7 @@ requires 'Params::Get';
 requires 'Scalar::Util';
 
 on 'test' => sub {
+	requires 'IPC::System::Simple';
 	requires 'Test::Carp';
 	requires 'Test::DescribeMe';
 	requires 'Test::Most';
