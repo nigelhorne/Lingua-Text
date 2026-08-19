@@ -362,15 +362,15 @@ Approximate LCSAJ segments: 39<br>
 </span><span class="">   21: 
 </span><span class="">   22: =head1 NAME
 </span><span class="">   23: 
-</span><span class="">   24: Lingua::Text - Class to contain text in many different languages
+</span><span class="">   24: Lingua::Text - Store the same text in many languages; retrieve it in the user&#39;s language automatically
 </span><span class="">   25: 
 </span><span class="">   26: =head1 VERSION
 </span><span class="">   27: 
-</span><span class="">   28: Version 0.08
+</span><span class="">   28: Version 0.07
 </span><span class="">   29: 
 </span><span class="">   30: =cut
 </span><span class="">   31: 
-</span><span class="">   32: our $VERSION = &#39;0.08&#39;;
+</span><span class="">   32: our $VERSION = &#39;0.07&#39;;
 </span><span class="">   33: our $AUTOLOAD;
 </span><span class="">   34: 
 </span><span class="">   35: # ---------------------------------------------------------------------------
@@ -538,459 +538,946 @@ is( func(INPUT), EXPECTED, &#39;Verify correct return value&#39; );
 </span><span class="">  128: 
 </span><span class="">  129: =head1 SYNOPSIS
 </span><span class="">  130: 
-</span><span class="">  131:     use Lingua::Text;
+</span><span class="">  131: =head2 Basic use: store translations and print in the user&#39;s language
 </span><span class="">  132: 
-</span><span class="">  133:     my $str = Lingua::Text-&gt;new();
-</span><span class="">  134:     $str-&gt;fr(&#39;Bonjour Tout le Monde&#39;);
-</span><span class="">  135:     $str-&gt;en(&#39;Hello, World&#39;);
-</span><span class="">  136: 
-</span><span class="">  137:     $ENV{&#39;LANG&#39;} = &#39;en_GB&#39;;
-</span><span class="">  138:     print &quot;$str\n&quot;;     # Hello, World
-</span><span class="">  139:     $ENV{&#39;LANG&#39;} = &#39;fr_FR&#39;;
-</span><span class="">  140:     print &quot;$str\n&quot;;     # Bonjour Tout le Monde
-</span><span class="">  141: 
-</span><span class="">  142:     my $text = Lingua::Text-&gt;new(&#39;hello&#39;);  # stores under the current locale
-</span><span class="">  143: 
-</span><span class="">  144: =head1 METHODS
-</span><span class="">  145: 
-</span><span class="">  146: =head2 new
-</span><span class="">  147: 
-</span><span class="">  148: =head3 PURPOSE
-</span><span class="">  149: 
-</span><span class="">  150: Construct a Lingua::Text object, optionally pre-populated with translations.
-</span><span class="">  151: Also supports cloning an existing object (with or without additional keys).
-</span><span class="">  152: 
-</span><span class="">  153: =head3 EXAMPLE
+</span><span class="">  133:     use Lingua::Text;
+</span><span class="">  134: 
+</span><span class="">  135:     my $greeting = Lingua::Text-&gt;new(
+</span><span class="">  136:         en =&gt; &#39;Hello&#39;,
+</span><span class="">  137:         fr =&gt; &#39;Bonjour&#39;,
+</span><span class="">  138:         de =&gt; &#39;Hallo&#39;,
+</span><span class="">  139:     );
+</span><span class="">  140: 
+</span><span class="">  141:     # The system locale (LANG, LC_MESSAGES, etc.) picks the language.
+</span><span class="">  142:     # No code change is needed when the user&#39;s OS language changes.
+</span><span class="">  143:     print $greeting, &quot;\n&quot;;
+</span><span class="">  144: 
+</span><span class="">  145: =head2 Add translations after construction
+</span><span class="">  146: 
+</span><span class="">  147:     my $label = Lingua::Text-&gt;new();
+</span><span class="">  148:     $label-&gt;en(&#39;Submit&#39;);
+</span><span class="">  149:     $label-&gt;fr(&#39;Envoyer&#39;);
+</span><span class="">  150:     $label-&gt;de(&#39;Abschicken&#39;);
+</span><span class="">  151: 
+</span><span class="">  152:     # Ask for a specific language explicitly
+</span><span class="">  153:     print $label-&gt;as_string(&#39;fr&#39;), &quot;\n&quot;;   # Envoyer
 </span><span class="">  154: 
-</span><span class="">  155:     # Empty object, add translations later
-</span><span class="">  156:     my $t = Lingua::Text-&gt;new();
-</span><span class="">  157: 
-</span><span class="">  158:     # Inline key/value pairs
-</span><span class="">  159:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39;);
-</span><span class="">  160: 
-</span><span class="">  161:     # Hash reference
-</span><span class="">  162:     my $t = Lingua::Text-&gt;new({ en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39; });
+</span><span class="">  155: =head2 Build from a database hash
+</span><span class="">  156: 
+</span><span class="">  157:     # Suppose the database returns: { en =&gt; &#39;Apple&#39;, fr =&gt; &#39;Pomme&#39;, de =&gt; &#39;Apfel&#39; }
+</span><span class="">  158:     my $row  = $db-&gt;selectrow_hashref(&#39;SELECT en, fr, de FROM fruit WHERE id = ?&#39;, {}, $id);
+</span><span class="">  159:     my $name = Lingua::Text-&gt;new($row);
+</span><span class="">  160:     print $name;   # prints in the user&#39;s system language
+</span><span class="">  161: 
+</span><span class="">  162: =head2 Add one translation to an existing object (clone)
 </span><span class="">  163: 
-</span><span class="">  164:     # Single scalar -- stored under the current locale language
-</span><span class="">  165:     my $t = Lingua::Text-&gt;new(&#39;hello&#39;);
+</span><span class="">  164:     my $base = Lingua::Text-&gt;new(en =&gt; &#39;colour&#39;, fr =&gt; &#39;couleur&#39;);
+</span><span class="">  165:     my $us   = $base-&gt;new(en =&gt; &#39;color&#39;);   # American English override
 </span><span class="">  166: 
-</span><span class="">  167:     # Clone with an extra translation
-</span><span class="">  168:     my $t2 = $t-&gt;new(de =&gt; &#39;Boot&#39;);
+</span><span class="">  167:     # $us  has en =&gt; &#39;color&#39;,  fr =&gt; &#39;couleur&#39;
+</span><span class="">  168:     # $base is unchanged: en =&gt; &#39;colour&#39;, fr =&gt; &#39;couleur&#39;
 </span><span class="">  169: 
-</span><span class="">  170: =head3 API SPECIFICATION
+</span><span class="">  170: =head2 Store text at runtime using a language variable
 </span><span class="">  171: 
-</span><span class="">  172: =head4 Input
-</span><span class="">  173: 
-</span><span class="">  174:     args : HASH | HASHREF | SCALAR | Lingua::Text | ()
-</span><span class="">  175: 
-</span><span class="">  176: =head4 Output
+</span><span class="">  172:     my $message = Lingua::Text-&gt;new();
+</span><span class="">  173:     my $user_lang = &#39;de&#39;;   # could come from a web request header
+</span><span class="">  174: 
+</span><span class="">  175:     $message-&gt;set(text =&gt; &#39;Willkommen&#39;, lang =&gt; $user_lang);
+</span><span class="">  176:     print $message-&gt;as_string($user_lang), &quot;\n&quot;;   # Willkommen
 </span><span class="">  177: 
-</span><span class="">  178:     Returns a blessed Lingua::Text reference, or undef on misuse.
+</span><span class="">  178: =head2 Prepare multilingual text for HTML output
 </span><span class="">  179: 
-</span><span class="">  180: =head3 MESSAGES
-</span><span class="">  181: 
-</span><span class="">  182:     &quot;use -&gt;new() not ::new() to instantiate&quot;
-</span><span class="">  183:         Cause:   Called as a function with arguments (Lingua::Text::new(...)).
-</span><span class="">  184:         Fix:     Use Lingua::Text-&gt;new(...).
-</span><span class="">  185: 
-</span><span class="">  186: =head3 FORMAL SPECIFICATION
-</span><span class="">  187: 
-</span><span class="">  188:     &acirc;&#148;&#140;&acirc;&#148;&#128; LinguaText &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  189:     &acirc;&#148;&#130; texts : LANG &acirc;&#134;&brvbar; TEXT
-</span><span class="">  190:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  191: 
-</span><span class="">  192:     LANG &acirc;&#137;&#153; { l : &acirc;&#132;&curren;* | l matches /^[a-z]{2}(_[A-Z]{2})?$/ }
-</span><span class="">  193:     TEXT &acirc;&#137;&#153; &acirc;&#132;&curren;*   (any Perl string)
-</span><span class="">  194: 
-</span><span class="">  195:     &acirc;&#148;&#140;&acirc;&#148;&#128; new &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  196:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
-</span><span class="">  197:     &acirc;&#148;&#130; args?  : &acirc;&#132;&#153;(LANG &Atilde;&#151; TEXT) &acirc;&#136;&ordf; {&acirc;&#136;&#133;}
-</span><span class="">  198:     &acirc;&#148;&#130; obj!   : LinguaText
-</span><span class="">  199:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  200:     &acirc;&#148;&#130; obj!.texts = args? &acirc;&#137;&nbsp; &acirc;&#136;&#133; &acirc;&#159;&sup1; args?
-</span><span class="">  201:     &acirc;&#148;&#130;                         | &acirc;&#136;&#133;
-</span><span class="">  202:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  203: 
-</span><span class="">  204: =cut
-</span><span class="">  205: 
-</span><span class="">  206: sub new {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">207 → 216 → 226</span></span>  207: 	my $class = shift;
+</span><span class="">  180:     my $title = Lingua::Text-&gt;new(
+</span><span class="">  181:         en =&gt; &#39;read more&#39;,
+</span><span class="">  182:         fr =&gt; &quot;lire la suite&quot;,
+</span><span class="">  183:     )-&gt;encode();   # converts accented characters to HTML entities
+</span><span class="">  184: 
+</span><span class="">  185:     print &quot;&lt;title&gt;$title&lt;/title&gt;&quot;;   # safe for browsers in any locale
+</span><span class="">  186: 
+</span><span class="">  187: =head1 DESCRIPTION
+</span><span class="">  188: 
+</span><span class="">  189: Lingua::Text is a simple container that stores the same piece of text in
+</span><span class="">  190: multiple languages inside a single Perl object.  When you ask the object to
+</span><span class="">  191: print itself (or convert to a string), it automatically reads the user&#39;s
+</span><span class="">  192: operating-system language setting and returns the correct translation.
+</span><span class="">  193: 
+</span><span class="">  194: =head2 How language detection works
+</span><span class="">  195: 
+</span><span class="">  196: The module reads the following environment variables, in this order, and uses
+</span><span class="">  197: the first one it finds that contains a two-letter language code:
+</span><span class="">  198: 
+</span><span class="">  199: =over 4
+</span><span class="">  200: 
+</span><span class="">  201: =item 1. C&lt;LANGUAGE&gt; (space- or colon-separated preference list, e.g. C&lt;fr:en&gt;)
+</span><span class="">  202: 
+</span><span class="">  203: =item 2. C&lt;LC_ALL&gt;
+</span><span class="">  204: 
+</span><span class="">  205: =item 3. C&lt;LC_MESSAGES&gt;
+</span><span class="">  206: 
+</span><span class="">  207: =item 4. C&lt;LANG&gt; (e.g. C&lt;en_US.UTF-8&gt; or C&lt;de_DE&gt;)
 </span><span class="">  208: 
-</span><span class="">  209: 	# Detect function-style misuse: Lingua::Text::new(args...)
-</span><span class="">  210: 	# A legitimate invocant is either a blessed object (clone) or a class name
-</span><span class="">  211: 	# that inherits from this package.  Anything else (e.g. the first key of a
-</span><span class="">  212: 	# hash accidentally consumed as the invocant) triggers a warning.
-</span><span class="">  213: 	my $is_class  = !ref($class) &amp;&amp; defined($class) &amp;&amp; eval { $class-&gt;isa(__PACKAGE__) };
-</span><span class="">  214: 	my $is_object = blessed($class);
-</span><span class="">  215: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  216: 	if(!defined($class) || (!$is_class &amp;&amp; !$is_object)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  217: 		# undef invocant = bare Lingua::Text::new() call with no args -- allowed
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  218: 		if(defined($class)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  219: 			Carp::carp(_err(&#39;new_oo_style&#39;));
-</span><span class="">  220: 			return;
-</span><span class="">  221: 		}
-</span><span class="">  222: 		$class = __PACKAGE__;
-</span><span class="">  223: 	}
-</span><span class="">  224: 
-</span><span class="">  225: 	# Build the initial parameter hash from whatever form the caller used
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">226 → 227 → 234</span></span>  226: 	my $params;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  227: 	if((scalar(@_) == 1) &amp;&amp; (!ref($_[0])) &amp;&amp; (my $lang = _get_language())) {
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  228: 		$params = { $lang =&gt; $_[0] };
-</span><span class="">  229: 	} elsif(@_) {
-</span><span class="">  230: 		$params = Params::Get::get_params(undef, @_);
-</span><span class="">  231: 	}
-</span><span class="">  232: 
-</span><span class="">  233: 	# Clone path: caller is an existing object
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">234 → 234 → 242</span></span>  234: 	if($is_object) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  235: 		if($params) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  236: 			return bless { texts =&gt; {%{$class-&gt;{&#39;texts&#39;}}, %{$params}} }, ref($class);
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  237: 		}
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  238: 		return bless { %{$class} }, ref($class);
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  239: 	}
-</span><span class="">  240: 
-</span><span class="">  241: 	# Allow Object::Configure to inject defaults (e.g. from a config file)
-</span><span class="">  242: 	$params = Object::Configure::configure($class, $params);
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  243: 	return bless( $params ? { texts =&gt; $params } : {}, $class );
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  244: }
-</span><span class="">  245: 
-</span><span class="">  246: =head2 set
-</span><span class="">  247: 
-</span><span class="">  248: =head3 PURPOSE
-</span><span class="">  249: 
-</span><span class="">  250: Store a translation for a given language code.  Equivalent to calling the
-</span><span class="">  251: AUTOLOAD accessor (e.g. C&lt;$t-&gt;en(&#39;Hello&#39;)&gt;) but allows the language to be
-</span><span class="">  252: supplied at runtime.
-</span><span class="">  253: 
-</span><span class="">  254: =head3 EXAMPLE
-</span><span class="">  255: 
-</span><span class="">  256:     $t-&gt;set({ text =&gt; &#39;House&#39;, lang =&gt; &#39;en&#39; });
-</span><span class="">  257:     $t-&gt;set(text =&gt; &#39;Maison&#39;, lang =&gt; &#39;fr&#39;);
-</span><span class="">  258:     $t-&gt;set(&#39;Haus&#39;);   # stores under the current locale language
-</span><span class="">  259: 
-</span><span class="">  260: =head3 API SPECIFICATION
-</span><span class="">  261: 
-</span><span class="">  262: =head4 Input
-</span><span class="">  263: 
-</span><span class="">  264:     text : SCALAR           -- the translation string (required)
-</span><span class="">  265:     lang : LANG             -- ISO 639-1 language code (default: system locale)
+</span><span class="">  209: =back
+</span><span class="">  210: 
+</span><span class="">  211: Only the first two letters are used (e.g. C&lt;en_GB.UTF-8&gt; becomes C&lt;en&gt;), so
+</span><span class="">  212: you only need to store one translation per language, not per locale variant.
+</span><span class="">  213: 
+</span><span class="">  214: If none of these variables is set, or if C&lt;LANG&gt; is set to the POSIX C&lt;C&gt;
+</span><span class="">  215: or C&lt;C.UTF-8&gt; locale, the module returns C&lt;undef&gt; (or C&lt;&#39;en&#39;&gt; for the C
+</span><span class="">  216: locale).
+</span><span class="">  217: 
+</span><span class="">  218: =head2 How string interpolation works
+</span><span class="">  219: 
+</span><span class="">  220: The object overloads Perl&#39;s C&lt;&quot;&quot;&gt; (stringify) operator.  This means you can
+</span><span class="">  221: use a Lingua::Text object directly in strings:
+</span><span class="">  222: 
+</span><span class="">  223:     print &quot;Hello: $greeting\n&quot;;
+</span><span class="">  224:     my $html = &quot;&lt;h1&gt;&quot; . $title . &quot;&lt;/h1&gt;&quot;;
+</span><span class="">  225: 
+</span><span class="">  226: You do B&lt;not&gt; need to call C&lt;as_string()&gt; yourself in most cases.
+</span><span class="">  227: 
+</span><span class="">  228: =head2 Language code format
+</span><span class="">  229: 
+</span><span class="">  230: Language codes follow ISO 639-1: two lower-case letters, e.g. C&lt;en&gt;, C&lt;fr&gt;,
+</span><span class="">  231: C&lt;de&gt;, C&lt;es&gt;, C&lt;zh&gt;.  An optional ISO 3166-1 country suffix may follow an
+</span><span class="">  232: underscore: C&lt;en_US&gt;, C&lt;zh_CN&gt;.  The module stores and retrieves by the
+</span><span class="">  233: two-letter code only; the country part of an environment variable is ignored
+</span><span class="">  234: during lookup.
+</span><span class="">  235: 
+</span><span class="">  236: =head1 METHODS
+</span><span class="">  237: 
+</span><span class="">  238: =head2 new
+</span><span class="">  239: 
+</span><span class="">  240: =head3 PURPOSE
+</span><span class="">  241: 
+</span><span class="">  242: Create a new Lingua::Text object.  The object starts empty, or pre-loaded
+</span><span class="">  243: with one or more translations you provide.
+</span><span class="">  244: 
+</span><span class="">  245: Calling C&lt;new()&gt; on an B&lt;existing&gt; object creates an independent copy (a
+</span><span class="">  246: clone) with any extra translations you supply merged in.  The original object
+</span><span class="">  247: is never modified.
+</span><span class="">  248: 
+</span><span class="">  249: =head3 ARGUMENTS
+</span><span class="">  250: 
+</span><span class="">  251: You may pass arguments in any of the following forms:
+</span><span class="">  252: 
+</span><span class="">  253: =over 4
+</span><span class="">  254: 
+</span><span class="">  255: =item No arguments -- creates an empty object
+</span><span class="">  256: 
+</span><span class="">  257:     my $t = Lingua::Text-&gt;new();
+</span><span class="">  258: 
+</span><span class="">  259: =item Key/value pairs -- one pair per language
+</span><span class="">  260: 
+</span><span class="">  261:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39;);
+</span><span class="">  262: 
+</span><span class="">  263: =item A hash reference
+</span><span class="">  264: 
+</span><span class="">  265:     my $t = Lingua::Text-&gt;new({ en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39; });
 </span><span class="">  266: 
-</span><span class="">  267: =head4 Output
+</span><span class="">  267: =item A single plain string -- stored under the current system locale language
 </span><span class="">  268: 
-</span><span class="">  269:     Returns $self on success (chainable via the C&lt;&quot;&quot;&gt; overload).
-</span><span class="">  270:     Returns undef and emits a carp warning on missing arguments.
-</span><span class="">  271: 
-</span><span class="">  272: =head3 MESSAGES
-</span><span class="">  273: 
-</span><span class="">  274:     &quot;Usage: set(text =&gt; $text, lang =&gt; $language)&quot;  [croak]
-</span><span class="">  275:         Cause:   Called with no arguments at all.
-</span><span class="">  276:         Fix:     Provide at minimum a text string.
+</span><span class="">  269:     # Only works if a locale environment variable is set.
+</span><span class="">  270:     # If no locale is set, the text is silently discarded.  See COMMON PITFALLS.
+</span><span class="">  271:     my $t = Lingua::Text-&gt;new(&#39;hello&#39;);
+</span><span class="">  272: 
+</span><span class="">  273: =item An existing Lingua::Text object -- creates a clone
+</span><span class="">  274: 
+</span><span class="">  275:     my $clone = $original-&gt;new();                      # exact copy
+</span><span class="">  276:     my $clone = $original-&gt;new(de =&gt; &#39;zusatz&#39;);        # copy + one more language
 </span><span class="">  277: 
-</span><span class="">  278:     &quot;usage: set(text =&gt; $text, lang =&gt; $language)&quot;  [carp]
-</span><span class="">  279:         Cause:   lang cannot be determined, or text is absent/undef.
-</span><span class="">  280:         Fix:     Pass lang explicitly or ensure the locale environment is set.
+</span><span class="">  278: =back
+</span><span class="">  279: 
+</span><span class="">  280: =head3 RETURN VALUE
 </span><span class="">  281: 
-</span><span class="">  282: =head3 FORMAL SPECIFICATION
+</span><span class="">  282: Returns a blessed Lingua::Text reference on success.
 </span><span class="">  283: 
-</span><span class="">  284:     &acirc;&#148;&#140;&acirc;&#148;&#128; set &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  285:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
-</span><span class="">  286:     &acirc;&#148;&#130; text? : TEXT
-</span><span class="">  287:     &acirc;&#148;&#130; lang? : LANG
-</span><span class="">  288:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  289:     &acirc;&#148;&#130; texts&#39; = texts &acirc;&#138;&#149; { lang? &acirc;&#134;&brvbar; text? }
-</span><span class="">  290:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  291: 
-</span><span class="">  292: =cut
-</span><span class="">  293: 
-</span><span class="">  294: sub set {
-</span><span class="">  295: 	my $self = shift;
-</span><span class="">  296: 
-</span><span class="">  297: 	Carp::croak(_err(&#39;set_no_args&#39;)) unless @_;
-</span><span class="">  298: 
-</span><span class="">  299: 	my $params = Params::Get::get_params(&#39;text&#39;, @_);
-</span><span class="">  300: 
-</span><span class="">  301: 	my $lang = $params-&gt;{&#39;lang&#39;} || _get_language();
-</span><span class="survived-2 tooltip" data-tooltip="Return value mutation survived. Add tests asserting exact return values. Boolean logic mutation survived. Add tests covering both true and false paths.">  302: 	return _carp_set_usage() unless defined($lang);
-</span>
-					<details class="mutant-details">
-					<summary>Mutants (Total: 2, Killed: 0, Survived: 2)</summary>
-					<ul>
-				<li><b>BOOL_NEGATE_302_2: Negate boolean return expression</b><br>MEDIUM: Add tests asserting both true and false outcomes
-
-								<div class="suggested-test">
-								<div class="suggest-label">🧪 Suggested Test</div>
-								<pre># Boolean branch test suggestion
-ok( !func(INPUT), &#39;Verify boolean branch behaviour&#39; );
-</pre>
-								</div>
-							</li><li><b>RETURN_UNDEF_302_2: Replace return expression with undef</b><br>LOW: Mutation survived, but impact may be minor
-
-								<div class="suggested-test">
-								<div class="suggest-label">🧪 Suggested Test</div>
-								<pre># Return value assertion
-is( func(INPUT), EXPECTED, &#39;Verify correct return value&#39; );
-</pre>
-								</div>
-							</li></ul></details>
-<span class="">  303: 
-</span><span class="">  304: 	my $text = $params-&gt;{&#39;text&#39;};
-</span><span class="survived-2 tooltip" data-tooltip="Boolean logic mutation survived. Add tests covering both true and false paths. Return value mutation survived. Add tests asserting exact return values.">  305: 	return _carp_set_usage() unless defined($text);
-</span>
-					<details class="mutant-details">
-					<summary>Mutants (Total: 2, Killed: 0, Survived: 2)</summary>
-					<ul>
-				<li><b>BOOL_NEGATE_305_2: Negate boolean return expression</b><br>MEDIUM: Add tests asserting both true and false outcomes
-
-								<div class="suggested-test">
-								<div class="suggest-label">🧪 Suggested Test</div>
-								<pre># Boolean branch test suggestion
-ok( !func(INPUT), &#39;Verify boolean branch behaviour&#39; );
-</pre>
-								</div>
-							</li><li><b>RETURN_UNDEF_305_2: Replace return expression with undef</b><br>LOW: Mutation survived, but impact may be minor
-
-								<div class="suggested-test">
-								<div class="suggest-label">🧪 Suggested Test</div>
-								<pre># Return value assertion
-is( func(INPUT), EXPECTED, &#39;Verify correct return value&#39; );
-</pre>
-								</div>
-							</li></ul></details>
-<span class="">  306: 
-</span><span class="">  307: 	$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = $text;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  308: 	return $self;
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  309: }
-</span><span class="">  310: 
-</span><span class="">  311: =head2 as_string
-</span><span class="">  312: 
-</span><span class="">  313: =head3 PURPOSE
-</span><span class="">  314: 
-</span><span class="">  315: Return the stored translation for a requested language, or for the system
-</span><span class="">  316: locale when no language is specified.  This method is also the target of the
-</span><span class="">  317: C&lt;&quot;&quot;&gt; stringification overload, so objects interpolate naturally in strings.
-</span><span class="">  318: 
-</span><span class="">  319: =head3 EXAMPLE
-</span><span class="">  320: 
-</span><span class="">  321:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39;);
-</span><span class="">  322: 
-</span><span class="">  323:     print $t-&gt;as_string(),             &quot;\n&quot;;  # uses $ENV{LANG}
-</span><span class="">  324:     print $t-&gt;as_string(&#39;fr&#39;),         &quot;\n&quot;;  # bateau
-</span><span class="">  325:     print $t-&gt;as_string(lang =&gt; &#39;en&#39;), &quot;\n&quot;;  # boat
-</span><span class="">  326:     print $t-&gt;as_string({ lang =&gt; &#39;fr&#39; }), &quot;\n&quot;;  # bateau
-</span><span class="">  327:     print &quot;$t\n&quot;;                             # uses $ENV{LANG}
-</span><span class="">  328: 
-</span><span class="">  329: =head3 API SPECIFICATION
-</span><span class="">  330: 
-</span><span class="">  331: =head4 Input
+</span><span class="">  284: Returns C&lt;undef&gt; and emits a C&lt;carp&gt; warning when called as a plain function
+</span><span class="">  285: with arguments (e.g. C&lt;Lingua::Text::new(en =&gt; &#39;hi&#39;)&gt; without the arrow).
+</span><span class="">  286: 
+</span><span class="">  287: =head3 EXAMPLE
+</span><span class="">  288: 
+</span><span class="">  289:     use Lingua::Text;
+</span><span class="">  290: 
+</span><span class="">  291:     # Empty object
+</span><span class="">  292:     my $t = Lingua::Text-&gt;new();
+</span><span class="">  293:     $t-&gt;en(&#39;Good morning&#39;);
+</span><span class="">  294:     $t-&gt;de(&#39;Guten Morgen&#39;);
+</span><span class="">  295: 
+</span><span class="">  296:     # Pre-populated from a hash reference
+</span><span class="">  297:     my %translations = (en =&gt; &#39;cat&#39;, fr =&gt; &#39;chat&#39;, de =&gt; &#39;Katze&#39;);
+</span><span class="">  298:     my $animal = Lingua::Text-&gt;new(\%translations);
+</span><span class="">  299: 
+</span><span class="">  300:     # Clone and override the English translation
+</span><span class="">  301:     my $us = $animal-&gt;new(en =&gt; &#39;kitty&#39;);
+</span><span class="">  302: 
+</span><span class="">  303: =head3 API SPECIFICATION
+</span><span class="">  304: 
+</span><span class="">  305: =head4 Input
+</span><span class="">  306: 
+</span><span class="">  307:     # Params::Validate::Strict-compatible schema
+</span><span class="">  308:     # (all parameters are optional; the whole argument list may be empty)
+</span><span class="">  309: 
+</span><span class="">  310:     en   =&gt; { type =&gt; SCALAR, optional =&gt; 1 }   # and any other ISO 639-1 code
+</span><span class="">  311:     fr   =&gt; { type =&gt; SCALAR, optional =&gt; 1 }
+</span><span class="">  312:     ...  # one key per language
+</span><span class="">  313: 
+</span><span class="">  314:     # OR a single HASHREF containing the same keys
+</span><span class="">  315: 
+</span><span class="">  316:     # OR a single SCALAR (stored under the current locale language)
+</span><span class="">  317: 
+</span><span class="">  318: =head4 Output
+</span><span class="">  319: 
+</span><span class="">  320:     # Return::Set schema
+</span><span class="">  321:     on_success =&gt; Lingua::Text,   # blessed reference
+</span><span class="">  322:     on_misuse  =&gt; undef           # with carp warning
+</span><span class="">  323: 
+</span><span class="">  324: =head3 MESSAGES
+</span><span class="">  325: 
+</span><span class="">  326: =over 4
+</span><span class="">  327: 
+</span><span class="">  328: =item C&lt;&quot;use -E&lt;gt&gt;new() not ::new() to instantiate&quot;&gt;  [carp]
+</span><span class="">  329: 
+</span><span class="">  330: You called C&lt;Lingua::Text::new(...)&gt; (double-colon, function style) with
+</span><span class="">  331: arguments.  Use C&lt;Lingua::Text-E&lt;gt&gt;new(...)&gt; (arrow, method style) instead.
 </span><span class="">  332: 
-</span><span class="">  333:     lang : LANG | ()    -- language code (optional; default: system locale)
+</span><span class="">  333: =back
 </span><span class="">  334: 
-</span><span class="">  335: =head4 Output
+</span><span class="">  335: =head3 FORMAL SPECIFICATION
 </span><span class="">  336: 
-</span><span class="">  337:     Returns the translation string, undef if none is stored for that language,
-</span><span class="">  338:     or undef with a carp warning when no language can be determined at all.
-</span><span class="">  339: 
-</span><span class="">  340: =head3 MESSAGES
-</span><span class="">  341: 
-</span><span class="">  342:     &quot;usage: as_string(lang =&gt; $language)&quot;  [carp]
-</span><span class="">  343:         Cause:   No lang argument and locale environment variables are absent.
-</span><span class="">  344:         Fix:     Pass lang explicitly or set LANG/LC_MESSAGES.
+</span><span class="">  337:     -- Type definitions
+</span><span class="">  338:     STRING == seq CHAR
+</span><span class="">  339:     LANG   == { l : STRING | l =~ /^[a-z]{2}(_[A-Z]{2})?$/ }
+</span><span class="">  340: 
+</span><span class="">  341:     -- State: a partial function from language codes to strings
+</span><span class="">  342:     &acirc;&#148;&#140;&acirc;&#148;&#128; LinguaText &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  343:     &acirc;&#148;&#130; texts : LANG &acirc;&#135;&cedil; STRING
+</span><span class="">  344:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
 </span><span class="">  345: 
-</span><span class="">  346: =head3 FORMAL SPECIFICATION
-</span><span class="">  347: 
-</span><span class="">  348:     &acirc;&#148;&#140;&acirc;&#148;&#128; as_string &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  349:     &acirc;&#148;&#130; &Icirc;&#158;LinguaText
-</span><span class="">  350:     &acirc;&#148;&#130; lang? : LANG &acirc;&#136;&ordf; {undef}
-</span><span class="">  351:     &acirc;&#148;&#130; result! : TEXT &acirc;&#136;&ordf; {undef}
-</span><span class="">  352:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  353:     &acirc;&#148;&#130; lang? &acirc;&#136;&#136; dom texts &acirc;&#159;&sup1; result! = texts(lang?)
-</span><span class="">  354:     &acirc;&#148;&#130; lang? &acirc;&#136;&#137; dom texts &acirc;&#159;&sup1; result! = undef
-</span><span class="">  355:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  356: 
-</span><span class="">  357: =cut
-</span><span class="">  358: 
-</span><span class="">  359: sub as_string {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">360 → 365 → 369</span></span>  360: 	my $self = shift;
-</span><span class="">  361: 
-</span><span class="">  362: 	# Guard against the overload calling convention: Perl passes ($self, $other, $swap)
-</span><span class="">  363: 	# when the &quot;&quot; handler is invoked during a comparison.  We only want the first arg.
-</span><span class="">  364: 	my $lang;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  365: 	if(@_ &amp;&amp; defined($_[0])) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  366: 		my $params = Params::Get::get_params(&#39;lang&#39;, @_);
-</span><span class="">  367: 		$lang = $params &amp;&amp; $params-&gt;{&#39;lang&#39;};
-</span><span class="">  368: 	}
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">369 → 371 → 374</span></span>  369: 	$lang //= _get_language();
-</span><span class="">  370: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  371: 	if(defined($lang)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  372: 		return $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  373: 	}
-</span><span class="">  374: 	Carp::carp(_err(&#39;str_usage&#39;));
-</span><span class="">  375: 	return;
-</span><span class="">  376: }
-</span><span class="">  377: 
-</span><span class="">  378: =head2 encode
-</span><span class="">  379: 
-</span><span class="">  380: =head3 PURPOSE
-</span><span class="">  381: 
-</span><span class="">  382: HTML-entity-encode every stored translation in place.  Call once before
-</span><span class="">  383: emitting text into an HTML context.
-</span><span class="">  384: 
-</span><span class="">  385: B&lt;Note&gt;: There is currently no C&lt;decode()&gt; counterpart; avoid double-encoding
-</span><span class="">  386: by calling C&lt;encode()&gt; only once on a freshly constructed object.
-</span><span class="">  387: 
-</span><span class="">  388: =head3 EXAMPLE
-</span><span class="">  389: 
-</span><span class="">  390:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;study&#39;, fr =&gt; &#39;&Atilde;&copy;tude&#39;)-&gt;encode();
-</span><span class="">  391:     print $t-&gt;fr();    # h&amp;eacute;tude
-</span><span class="">  392: 
-</span><span class="">  393: =head3 API SPECIFICATION
-</span><span class="">  394: 
-</span><span class="">  395: =head4 Input
-</span><span class="">  396: 
-</span><span class="">  397:     None.
-</span><span class="">  398: 
-</span><span class="">  399: =head4 Output
-</span><span class="">  400: 
-</span><span class="">  401:     Returns $self (chainable).
-</span><span class="">  402: 
-</span><span class="">  403: =head3 FORMAL SPECIFICATION
+</span><span class="">  346:     -- Construction: initialise texts from zero or more lang/string pairs
+</span><span class="">  347:     &acirc;&#148;&#140;&acirc;&#148;&#128; new &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  348:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
+</span><span class="">  349:     &acirc;&#148;&#130; init? : LANG &acirc;&#135;&cedil; STRING
+</span><span class="">  350:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  351:     &acirc;&#148;&#130; texts&#39; = init?
+</span><span class="">  352:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  353: 
+</span><span class="">  354:     -- Clone: merge the parent&#39;s texts with any new pairs (new pairs win)
+</span><span class="">  355:     &acirc;&#148;&#140;&acirc;&#148;&#128; clone &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  356:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
+</span><span class="">  357:     &acirc;&#148;&#130; parent? : LinguaText
+</span><span class="">  358:     &acirc;&#148;&#130; extra?  : LANG &acirc;&#135;&cedil; STRING
+</span><span class="">  359:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  360:     &acirc;&#148;&#130; texts&#39; = parent?.texts &acirc;&#138;&#149; extra?
+</span><span class="">  361:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  362: 
+</span><span class="">  363: =cut
+</span><span class="">  364: 
+</span><span class="">  365: sub new {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">366 → 375 → 385</span></span>  366: 	my $class = shift;
+</span><span class="">  367: 
+</span><span class="">  368: 	# Detect function-style misuse: Lingua::Text::new(args...)
+</span><span class="">  369: 	# A legitimate invocant is either a blessed object (clone) or a class name
+</span><span class="">  370: 	# that inherits from this package.  Anything else (e.g. the first key of a
+</span><span class="">  371: 	# hash accidentally consumed as the invocant) triggers a warning.
+</span><span class="">  372: 	my $is_class  = !ref($class) &amp;&amp; defined($class) &amp;&amp; eval { $class-&gt;isa(__PACKAGE__) };
+</span><span class="">  373: 	my $is_object = blessed($class);
+</span><span class="">  374: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  375: 	if(!defined($class) || (!$is_class &amp;&amp; !$is_object)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  376: 		# undef invocant = bare Lingua::Text::new() call with no args -- allowed
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  377: 		if(defined($class)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  378: 			Carp::carp(_err(&#39;new_oo_style&#39;));
+</span><span class="">  379: 			return;
+</span><span class="">  380: 		}
+</span><span class="">  381: 		$class = __PACKAGE__;
+</span><span class="">  382: 	}
+</span><span class="">  383: 
+</span><span class="">  384: 	# Build the initial parameter hash from whatever form the caller used
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">385 → 386 → 393</span></span>  385: 	my $params;
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  386: 	if((scalar(@_) == 1) &amp;&amp; (!ref($_[0])) &amp;&amp; (my $lang = _get_language())) {
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  387: 		$params = { $lang =&gt; $_[0] };
+</span><span class="">  388: 	} elsif(@_) {
+</span><span class="">  389: 		$params = Params::Get::get_params(undef, @_);
+</span><span class="">  390: 	}
+</span><span class="">  391: 
+</span><span class="">  392: 	# Clone path: caller is an existing object
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">393 → 393 → 401</span></span>  393: 	if($is_object) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  394: 		if($params) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  395: 			return bless { texts =&gt; {%{$class-&gt;{&#39;texts&#39;}}, %{$params}} }, ref($class);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  396: 		}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  397: 		return bless { %{$class} }, ref($class);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  398: 	}
+</span><span class="">  399: 
+</span><span class="">  400: 	# Allow Object::Configure to inject defaults (e.g. from a config file)
+</span><span class="">  401: 	$params = Object::Configure::configure($class, $params);
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  402: 	return bless( $params ? { texts =&gt; $params } : {}, $class );
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  403: }
 </span><span class="">  404: 
-</span><span class="">  405:     &acirc;&#148;&#140;&acirc;&#148;&#128; encode &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  406:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
-</span><span class="">  407:     &acirc;&#148;&#130; encode : TEXT &acirc;&#134;&#146; TEXT
-</span><span class="">  408:     &acirc;&#148;&#130; encode(t) = HTML_entity_encode(utf8_decode(t))
-</span><span class="">  409:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
-</span><span class="">  410:     &acirc;&#148;&#130; &acirc;&#136;&#128; l &acirc;&#136;&#136; dom texts &acirc;&#128;&cent; texts&#39;(l) = encode(texts(l))
-</span><span class="">  411:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  405: =head2 set
+</span><span class="">  406: 
+</span><span class="">  407: =head3 PURPOSE
+</span><span class="">  408: 
+</span><span class="">  409: Store or replace a single translation.  Use this when the language code is
+</span><span class="">  410: held in a variable at runtime; if the language is fixed at coding time, the
+</span><span class="">  411: shorthand accessor (e.g. C&lt;$t-E&lt;gt&gt;en(&#39;Hello&#39;)&gt;) is simpler.
 </span><span class="">  412: 
-</span><span class="">  413: =cut
+</span><span class="">  413: =head3 ARGUMENTS
 </span><span class="">  414: 
-</span><span class="">  415: sub encode {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">416 → 419 → 424</span></span>  416: 	my $self = shift;
+</span><span class="">  415:     text  -- the translation string (required)
+</span><span class="">  416:     lang  -- two-letter language code (optional; defaults to the system locale)
 </span><span class="">  417: 
-</span><span class="">  418: 	# Iterate over keys to avoid stale iterator state from each()
-</span><span class="">  419: 	for my $lang (keys %{$self-&gt;{&#39;texts&#39;}}) {
-</span><span class="">  420: 		my $v = $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
-</span><span class="">  421: 		utf8::decode($v) unless utf8::is_utf8($v);
-</span><span class="">  422: 		$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = HTML::Entities::encode_entities($v);
-</span><span class="">  423: 	}
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  424: 	return $self;
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  425: }
-</span><span class="">  426: 
-</span><span class="">  427: =head2 AUTOLOAD (language accessors)
-</span><span class="">  428: 
-</span><span class="">  429: =head3 PURPOSE
+</span><span class="">  418: The arguments may be passed as a hash, a hash reference, or as a plain
+</span><span class="">  419: positional string (only C&lt;text&gt;; C&lt;lang&gt; then comes from the system locale).
+</span><span class="">  420: 
+</span><span class="">  421: =head3 RETURN VALUE
+</span><span class="">  422: 
+</span><span class="">  423: Returns the object itself (C&lt;$self&gt;) on success, so calls may be chained.
+</span><span class="">  424: Because the object stringifies to its current-locale translation, the return
+</span><span class="">  425: value often I&lt;looks&gt; like the text you just stored -- but it is the object,
+</span><span class="">  426: not the string.  See L&lt;/COMMON PITFALLS&gt;.
+</span><span class="">  427: 
+</span><span class="">  428: Returns C&lt;undef&gt; and emits a C&lt;carp&gt; warning when required arguments are
+</span><span class="">  429: missing or when no language can be determined.
 </span><span class="">  430: 
-</span><span class="">  431: Any two-letter lower-case method name that matches a valid ISO 639-1 code is
-</span><span class="">  432: treated as a getter/setter for that language&#39;s translation.
-</span><span class="">  433: 
-</span><span class="">  434:     $t-&gt;en(&#39;Hello&#39;);       # set English
-</span><span class="">  435:     my $fr = $t-&gt;fr();     # get French (undef if not stored)
-</span><span class="">  436: 
-</span><span class="">  437: Setting a translation to C&lt;undef&gt; or the empty string C&lt;&#39;&#39;&gt; is valid and will
-</span><span class="">  438: store that value (clearing a translation is intentional).
-</span><span class="">  439: 
-</span><span class="">  440: =cut
-</span><span class="">  441: 
-</span><span class="">  442: sub AUTOLOAD {
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">443 → 453 → 457</span></span>  443: 	my $self = shift or return;
-</span><span class="">  444: 
-</span><span class="">  445: 	my ($key) = $AUTOLOAD =~ /::(\w+)$/;
-</span><span class="">  446: 
-</span><span class="">  447: 	return if $key eq &#39;DESTROY&#39;;
-</span><span class="">  448: 	return unless ref($self) eq __PACKAGE__;
-</span><span class="">  449: 	return unless $key =~ /^[a-z]{2}$/i;
-</span><span class="">  450: 	return unless _is_valid_language($key);
+</span><span class="">  431: =head3 EXAMPLE
+</span><span class="">  432: 
+</span><span class="">  433:     my $t = Lingua::Text-&gt;new();
+</span><span class="">  434: 
+</span><span class="">  435:     # Hash-reference form
+</span><span class="">  436:     $t-&gt;set({ text =&gt; &#39;House&#39;, lang =&gt; &#39;en&#39; });
+</span><span class="">  437: 
+</span><span class="">  438:     # Flat hash form
+</span><span class="">  439:     $t-&gt;set(text =&gt; &#39;Maison&#39;, lang =&gt; &#39;fr&#39;);
+</span><span class="">  440: 
+</span><span class="">  441:     # Positional: lang comes from the system locale
+</span><span class="">  442:     $t-&gt;set(&#39;Haus&#39;);   # stored under whatever language $ENV{LANG} says
+</span><span class="">  443: 
+</span><span class="">  444:     # Method chaining (set() returns $self)
+</span><span class="">  445:     my $t = Lingua::Text-&gt;new()-&gt;set(text =&gt; &#39;Hello&#39;, lang =&gt; &#39;en&#39;)
+</span><span class="">  446:                                 -&gt;set(text =&gt; &#39;Hola&#39;,  lang =&gt; &#39;es&#39;);
+</span><span class="">  447: 
+</span><span class="">  448:     # Store the language code from a variable
+</span><span class="">  449:     my $user_lang = &#39;de&#39;;
+</span><span class="">  450:     $t-&gt;set(text =&gt; &#39;Willkommen&#39;, lang =&gt; $user_lang);
 </span><span class="">  451: 
-</span><span class="">  452: 	# Use @_ presence (not truthiness) so falsy values like &#39;0&#39; or &#39;&#39; are stored
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  453: 	if(@_) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  454: 		$self-&gt;{&#39;texts&#39;}-&gt;{$key} = shift;
-</span><span class="">  455: 	}
-</span><span class="">  456: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  457: 	return $self-&gt;{&#39;texts&#39;}-&gt;{$key};
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  458: }
-</span><span class="">  459: 
-</span><span class="">  460: =head1 LIMITATIONS
-</span><span class="">  461: 
-</span><span class="">  462: =over 4
-</span><span class="">  463: 
-</span><span class="">  464: =item * No C&lt;decode()&gt; method exists to reverse C&lt;encode()&gt;.  Double-encoding
-</span><span class="">  465: is a real risk if C&lt;encode()&gt; is called on an already-encoded object.
-</span><span class="">  466: 
-</span><span class="">  467: =item * Language fallback is absent: if a requested language has no stored
-</span><span class="">  468: translation, C&lt;undef&gt; is returned rather than falling back to a related locale
-</span><span class="">  469: (e.g. C&lt;en_GB&gt; &acirc;&#134;&#146; C&lt;en&gt;).
-</span><span class="">  470: 
-</span><span class="">  471: =item * The AUTOLOAD accessor silently ignores unrecognised method names that
-</span><span class="">  472: are not two-letter codes, returning C&lt;undef&gt;.  Typos in language codes produce
-</span><span class="">  473: no diagnostic.
-</span><span class="">  474: 
-</span><span class="">  475: =item * C&lt;Object::Configure&gt; support is best-effort; the exact semantics depend
-</span><span class="">  476: on the installed version and any project-level configuration that is present.
+</span><span class="">  452: =head3 API SPECIFICATION
+</span><span class="">  453: 
+</span><span class="">  454: =head4 Input
+</span><span class="">  455: 
+</span><span class="">  456:     # Params::Validate::Strict-compatible schema
+</span><span class="">  457:     text =&gt; {
+</span><span class="">  458:         type     =&gt; SCALAR,
+</span><span class="">  459:         required =&gt; 1,
+</span><span class="">  460:     },
+</span><span class="">  461:     lang =&gt; {
+</span><span class="">  462:         type     =&gt; SCALAR,
+</span><span class="">  463:         optional =&gt; 1,
+</span><span class="">  464:         default  =&gt; _get_language(),     # falls back to system locale
+</span><span class="">  465:         regex    =&gt; qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
+</span><span class="">  466:     }
+</span><span class="">  467: 
+</span><span class="">  468: =head4 Output
+</span><span class="">  469: 
+</span><span class="">  470:     # Return::Set schema
+</span><span class="">  471:     on_success          =&gt; $self,    # the same Lingua::Text object
+</span><span class="">  472:     on_no_args          =&gt; undef     # with croak (programmer error)
+</span><span class="">  473:     on_missing_lang     =&gt; undef     # with carp
+</span><span class="">  474:     on_missing_text     =&gt; undef     # with carp
+</span><span class="">  475: 
+</span><span class="">  476: =head3 MESSAGES
 </span><span class="">  477: 
-</span><span class="">  478: =back
+</span><span class="">  478: =over 4
 </span><span class="">  479: 
-</span><span class="">  480: =head1 AUTHOR
+</span><span class="">  480: =item C&lt;&quot;Usage: set(text =E&lt;gt&gt; $text, lang =E&lt;gt&gt; $language)&quot;&gt;  [croak]
 </span><span class="">  481: 
-</span><span class="">  482: Nigel Horne, C&lt;&lt; &lt;njh at nigelhorne.com&gt; &gt;&gt;
+</span><span class="">  482: C&lt;set()&gt; was called with no arguments at all.  Provide at least C&lt;text&gt;.
 </span><span class="">  483: 
-</span><span class="">  484: =head1 BUGS
+</span><span class="">  484: =item C&lt;&quot;usage: set(text =E&lt;gt&gt; $text, lang =E&lt;gt&gt; $language)&quot;&gt;  [carp]
 </span><span class="">  485: 
-</span><span class="">  486: Please report bugs via L&lt;https://github.com/nigelhorne/Lingua-Text/issues&gt;.
-</span><span class="">  487: 
-</span><span class="">  488: =head1 SEE ALSO
-</span><span class="">  489: 
-</span><span class="">  490: =over 4
-</span><span class="">  491: 
-</span><span class="">  492: =item * L&lt;Configure an Object at Runtime|Object::Configure&gt;
-</span><span class="">  493: 
-</span><span class="">  494: =item * L&lt;Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/&gt;
-</span><span class="">  495: 
-</span><span class="">  496: =back
-</span><span class="">  497: 
-</span><span class="">  498: =head1 SUPPORT
-</span><span class="">  499: 
-</span><span class="">  500: This module is provided as-is without any warranty.
-</span><span class="">  501: 
-</span><span class="">  502: You can find documentation for this module with the perldoc command.
-</span><span class="">  503: 
-</span><span class="">  504:     perldoc Lingua::Text
-</span><span class="">  505: 
-</span><span class="">  506: You can also look for information at:
+</span><span class="">  486: Either C&lt;text&gt; is missing/undef, or C&lt;lang&gt; is missing and no locale
+</span><span class="">  487: environment variable is set.  Pass C&lt;lang&gt; explicitly to resolve the latter.
+</span><span class="">  488: 
+</span><span class="">  489: =back
+</span><span class="">  490: 
+</span><span class="">  491: =head3 FORMAL SPECIFICATION
+</span><span class="">  492: 
+</span><span class="">  493:     -- set: add or replace one translation; all others remain unchanged
+</span><span class="">  494:     &acirc;&#148;&#140;&acirc;&#148;&#128; set &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  495:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
+</span><span class="">  496:     &acirc;&#148;&#130; lang? : LANG
+</span><span class="">  497:     &acirc;&#148;&#130; text? : STRING
+</span><span class="">  498:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  499:     &acirc;&#148;&#130; texts&#39; = texts &acirc;&#138;&#149; { lang? &acirc;&#134;&brvbar; text? }
+</span><span class="">  500:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  501:     -- &acirc;&#138;&#149; denotes relational override: lang? wins over any existing entry
+</span><span class="">  502: 
+</span><span class="">  503: =cut
+</span><span class="">  504: 
+</span><span class="">  505: sub set {
+</span><span class="">  506: 	my $self = shift;
 </span><span class="">  507: 
-</span><span class="">  508: =over 4
+</span><span class="">  508: 	Carp::croak(_err(&#39;set_no_args&#39;)) unless @_;
 </span><span class="">  509: 
-</span><span class="">  510: =item * MetaCPAN
+</span><span class="">  510: 	my $params = Params::Get::get_params(&#39;text&#39;, @_);
 </span><span class="">  511: 
-</span><span class="">  512: L&lt;https://metacpan.org/release/Lingua-Text&gt;
-</span><span class="">  513: 
-</span><span class="">  514: =item * RT: CPAN&#39;s request tracker
-</span><span class="">  515: 
-</span><span class="">  516: L&lt;https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text&gt;
-</span><span class="">  517: 
-</span><span class="">  518: =item * CPANTS
-</span><span class="">  519: 
-</span><span class="">  520: L&lt;http://cpants.cpanauthors.org/dist/Lingua-Text&gt;
+</span><span class="">  512: 	my $lang = $params-&gt;{&#39;lang&#39;} || _get_language();
+</span><span class="survived-2 tooltip" data-tooltip="Boolean logic mutation survived. Add tests covering both true and false paths. Return value mutation survived. Add tests asserting exact return values.">  513: 	return _carp_set_usage() unless defined($lang);
+</span>
+					<details class="mutant-details">
+					<summary>Mutants (Total: 2, Killed: 0, Survived: 2)</summary>
+					<ul>
+				<li><b>BOOL_NEGATE_513_2: Negate boolean return expression</b><br>MEDIUM: Add tests asserting both true and false outcomes
+
+								<div class="suggested-test">
+								<div class="suggest-label">🧪 Suggested Test</div>
+								<pre># Boolean branch test suggestion
+ok( !func(INPUT), &#39;Verify boolean branch behaviour&#39; );
+</pre>
+								</div>
+							</li><li><b>RETURN_UNDEF_513_2: Replace return expression with undef</b><br>LOW: Mutation survived, but impact may be minor
+
+								<div class="suggested-test">
+								<div class="suggest-label">🧪 Suggested Test</div>
+								<pre># Return value assertion
+is( func(INPUT), EXPECTED, &#39;Verify correct return value&#39; );
+</pre>
+								</div>
+							</li></ul></details>
+<span class="">  514: 
+</span><span class="">  515: 	my $text = $params-&gt;{&#39;text&#39;};
+</span><span class="survived-2 tooltip" data-tooltip="Return value mutation survived. Add tests asserting exact return values. Boolean logic mutation survived. Add tests covering both true and false paths.">  516: 	return _carp_set_usage() unless defined($text);
+</span>
+					<details class="mutant-details">
+					<summary>Mutants (Total: 2, Killed: 0, Survived: 2)</summary>
+					<ul>
+				<li><b>BOOL_NEGATE_516_2: Negate boolean return expression</b><br>MEDIUM: Add tests asserting both true and false outcomes
+
+								<div class="suggested-test">
+								<div class="suggest-label">🧪 Suggested Test</div>
+								<pre># Boolean branch test suggestion
+ok( !func(INPUT), &#39;Verify boolean branch behaviour&#39; );
+</pre>
+								</div>
+							</li><li><b>RETURN_UNDEF_516_2: Replace return expression with undef</b><br>LOW: Mutation survived, but impact may be minor
+
+								<div class="suggested-test">
+								<div class="suggest-label">🧪 Suggested Test</div>
+								<pre># Return value assertion
+is( func(INPUT), EXPECTED, &#39;Verify correct return value&#39; );
+</pre>
+								</div>
+							</li></ul></details>
+<span class="">  517: 
+</span><span class="">  518: 	$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = $text;
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  519: 	return $self;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  520: }
 </span><span class="">  521: 
-</span><span class="">  522: =item * CPAN Testers&#39; Matrix
+</span><span class="">  522: =head2 as_string
 </span><span class="">  523: 
-</span><span class="">  524: L&lt;http://matrix.cpantesters.org/?dist=Lingua-Text&gt;
+</span><span class="">  524: =head3 PURPOSE
 </span><span class="">  525: 
-</span><span class="">  526: =item * CPAN Testers Dependencies
-</span><span class="">  527: 
-</span><span class="">  528: L&lt;http://deps.cpantesters.org/?module=Lingua-Text&gt;
-</span><span class="">  529: 
-</span><span class="">  530: =back
-</span><span class="">  531: 
-</span><span class="">  532: =head1 LICENCE AND COPYRIGHT
-</span><span class="">  533: 
-</span><span class="">  534: Copyright 2021-2026 Nigel Horne.
-</span><span class="">  535: 
-</span><span class="">  536: Usage is subject to the GPL2 licence terms.
-</span><span class="">  537: If you use it, please let me know.
+</span><span class="">  526: Return the stored translation for a given language, or for the system locale
+</span><span class="">  527: when no language is specified.
+</span><span class="">  528: 
+</span><span class="">  529: This method is also invoked automatically whenever Perl needs to convert the
+</span><span class="">  530: object to a string -- for example inside C&lt;print&gt;, in string concatenation, or
+</span><span class="">  531: in a comparison like C&lt;$t eq &#39;hello&#39;&gt;.  You rarely need to call it directly.
+</span><span class="">  532: 
+</span><span class="">  533: =head3 ARGUMENTS
+</span><span class="">  534: 
+</span><span class="">  535:     lang  -- two-letter language code (optional; defaults to the system locale)
+</span><span class="">  536: 
+</span><span class="">  537: Accepted forms:
 </span><span class="">  538: 
-</span><span class="">  539: =cut
-</span><span class="">  540: 
-</span><span class="">  541: 1;
+</span><span class="">  539:     $t-&gt;as_string()                  # uses system locale
+</span><span class="">  540:     $t-&gt;as_string(&#39;fr&#39;)              # positional
+</span><span class="">  541:     $t-&gt;as_string(lang =&gt; &#39;fr&#39;)      # named
+</span><span class="">  542:     $t-&gt;as_string({ lang =&gt; &#39;fr&#39; })  # hash reference
+</span><span class="">  543:     &quot;$t&quot;                             # stringification overload (uses system locale)
+</span><span class="">  544: 
+</span><span class="">  545: =head3 RETURN VALUE
+</span><span class="">  546: 
+</span><span class="">  547: =over 4
+</span><span class="">  548: 
+</span><span class="">  549: =item Returns the translation string when the language is known and stored.
+</span><span class="">  550: 
+</span><span class="">  551: =item Returns C&lt;undef&gt; -- B&lt;without&gt; a warning -- when the language is known
+</span><span class="">  552: but no translation exists for it.  This is the normal &quot;not translated yet&quot;
+</span><span class="">  553: case.
+</span><span class="">  554: 
+</span><span class="">  555: =item Returns C&lt;undef&gt; -- B&lt;with&gt; a C&lt;carp&gt; warning -- when no language can
+</span><span class="">  556: be determined (no argument supplied I&lt;and&gt; no locale environment variable set).
+</span><span class="">  557: 
+</span><span class="">  558: =back
+</span><span class="">  559: 
+</span><span class="">  560: =head3 EXAMPLE
+</span><span class="">  561: 
+</span><span class="">  562:     use Lingua::Text;
+</span><span class="">  563: 
+</span><span class="">  564:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;boat&#39;, fr =&gt; &#39;bateau&#39;);
+</span><span class="">  565: 
+</span><span class="">  566:     # Explicit language
+</span><span class="">  567:     print $t-&gt;as_string(&#39;en&#39;), &quot;\n&quot;;              # boat
+</span><span class="">  568:     print $t-&gt;as_string(lang =&gt; &#39;fr&#39;), &quot;\n&quot;;      # bateau
+</span><span class="">  569: 
+</span><span class="">  570:     # System locale (assume LANG=de_DE.UTF-8)
+</span><span class="">  571:     print $t-&gt;as_string(), &quot;\n&quot;;                  # undef -- no German stored
+</span><span class="">  572: 
+</span><span class="">  573:     # String interpolation (same as calling as_string() with no args)
+</span><span class="">  574:     $ENV{LANG} = &#39;en_US.UTF-8&#39;;
+</span><span class="">  575:     print &quot;I see a $t.\n&quot;;                        # I see a boat.
+</span><span class="">  576: 
+</span><span class="">  577:     # Checking for a missing translation
+</span><span class="">  578:     if(!defined($t-&gt;as_string(&#39;zh&#39;))) {
+</span><span class="">  579:         print &quot;No Chinese translation available.\n&quot;;
+</span><span class="">  580:     }
+</span><span class="">  581: 
+</span><span class="">  582: =head3 API SPECIFICATION
+</span><span class="">  583: 
+</span><span class="">  584: =head4 Input
+</span><span class="">  585: 
+</span><span class="">  586:     # Params::Validate::Strict-compatible schema
+</span><span class="">  587:     lang =&gt; {
+</span><span class="">  588:         type     =&gt; SCALAR,
+</span><span class="">  589:         optional =&gt; 1,
+</span><span class="">  590:         default  =&gt; _get_language(),
+</span><span class="">  591:         regex    =&gt; qr/^[a-z]{2}(?:_[A-Z]{2})?$/,
+</span><span class="">  592:     }
+</span><span class="">  593: 
+</span><span class="">  594: =head4 Output
+</span><span class="">  595: 
+</span><span class="">  596:     # Return::Set schema
+</span><span class="">  597:     on_found         =&gt; SCALAR,    # the translation string
+</span><span class="">  598:     on_not_found     =&gt; undef,     # language is known; no translation stored
+</span><span class="">  599:     on_no_language   =&gt; undef      # with carp warning
+</span><span class="">  600: 
+</span><span class="">  601: =head3 MESSAGES
+</span><span class="">  602: 
+</span><span class="">  603: =over 4
+</span><span class="">  604: 
+</span><span class="">  605: =item C&lt;&quot;usage: as_string(lang =E&lt;gt&gt; $language)&quot;&gt;  [carp]
+</span><span class="">  606: 
+</span><span class="">  607: No C&lt;lang&gt; was supplied and no locale environment variable (C&lt;LANG&gt;,
+</span><span class="">  608: C&lt;LC_MESSAGES&gt;, C&lt;LC_ALL&gt;, C&lt;LANGUAGE&gt;) is set.  Either pass the language
+</span><span class="">  609: explicitly or set the locale before calling.
+</span><span class="">  610: 
+</span><span class="">  611: =back
+</span><span class="">  612: 
+</span><span class="">  613: =head3 FORMAL SPECIFICATION
+</span><span class="">  614: 
+</span><span class="">  615:     -- as_string: look up one translation; state is unchanged (Xi schema)
+</span><span class="">  616:     &acirc;&#148;&#140;&acirc;&#148;&#128; as_string &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  617:     &acirc;&#148;&#130; &Icirc;&#158;LinguaText
+</span><span class="">  618:     &acirc;&#148;&#130; lang?    : LANG &acirc;&#136;&ordf; { current_locale }
+</span><span class="">  619:     &acirc;&#148;&#130; result!  : STRING &acirc;&#136;&ordf; { undef }
+</span><span class="">  620:     &acirc;&#148;&#156;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  621:     &acirc;&#148;&#130; lang? &acirc;&#136;&#136; dom texts  &acirc;&#159;&sup1;  result! = texts(lang?)
+</span><span class="">  622:     &acirc;&#148;&#130; lang? &acirc;&#136;&#137; dom texts  &acirc;&#159;&sup1;  result! = undef
+</span><span class="">  623:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  624:     -- The state schema &Icirc;&#158; means texts is not modified by this operation.
+</span><span class="">  625: 
+</span><span class="">  626: =cut
+</span><span class="">  627: 
+</span><span class="">  628: sub as_string {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">629 → 634 → 638</span></span>  629: 	my $self = shift;
+</span><span class="">  630: 
+</span><span class="">  631: 	# Guard against the overload calling convention: Perl passes ($self, $other, $swap)
+</span><span class="">  632: 	# when the &quot;&quot; handler is invoked during a comparison.  We only want the first arg.
+</span><span class="">  633: 	my $lang;
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  634: 	if(@_ &amp;&amp; defined($_[0])) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  635: 		my $params = Params::Get::get_params(&#39;lang&#39;, @_);
+</span><span class="">  636: 		$lang = $params &amp;&amp; $params-&gt;{&#39;lang&#39;};
+</span><span class="">  637: 	}
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">638 → 640 → 643</span></span>  638: 	$lang //= _get_language();
+</span><span class="">  639: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  640: 	if(defined($lang)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  641: 		return $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  642: 	}
+</span><span class="">  643: 	Carp::carp(_err(&#39;str_usage&#39;));
+</span><span class="">  644: 	return;
+</span><span class="">  645: }
+</span><span class="">  646: 
+</span><span class="">  647: =head2 encode
+</span><span class="">  648: 
+</span><span class="">  649: =head3 PURPOSE
+</span><span class="">  650: 
+</span><span class="">  651: Convert every stored translation from raw Unicode text to HTML entities.
+</span><span class="">  652: Call this once on an object before embedding its text in HTML pages, to make
+</span><span class="">  653: accented characters and other special characters safe for all browsers.
+</span><span class="">  654: 
+</span><span class="">  655: For example, the French word C&lt;&quot;\x{E9}tude&quot;&gt; (e-acute followed by &quot;tude&quot;)
+</span><span class="">  656: becomes C&lt;&quot;&amp;eacute;tude&quot;&gt; after encoding.
+</span><span class="">  657: 
+</span><span class="">  658: B&lt;Important:&gt; This method modifies the object I&lt;in place&gt; and B&lt;cannot be
+</span><span class="">  659: undone&gt;.  There is no C&lt;decode()&gt; counterpart.  See L&lt;/COMMON PITFALLS&gt;.
+</span><span class="">  660: 
+</span><span class="">  661: =head3 ARGUMENTS
+</span><span class="">  662: 
+</span><span class="">  663: None.
+</span><span class="">  664: 
+</span><span class="">  665: =head3 RETURN VALUE
+</span><span class="">  666: 
+</span><span class="">  667: Returns the object itself (C&lt;$self&gt;), so C&lt;encode()&gt; can be chained directly
+</span><span class="">  668: onto C&lt;new()&gt;.
+</span><span class="">  669: 
+</span><span class="">  670: =head3 EXAMPLE
+</span><span class="">  671: 
+</span><span class="">  672:     use Lingua::Text;
+</span><span class="">  673: 
+</span><span class="">  674:     # Build an object and encode it in one step
+</span><span class="">  675:     my $t = Lingua::Text-&gt;new(
+</span><span class="">  676:         en =&gt; &#39;study&#39;,
+</span><span class="">  677:         fr =&gt; &quot;\x{E9}tude&quot;,     # e with acute accent (Unicode codepoint U+00E9)
+</span><span class="">  678:     )-&gt;encode();
+</span><span class="">  679: 
+</span><span class="">  680:     print $t-&gt;fr();    # &amp;eacute;tude
+</span><span class="">  681:     print $t-&gt;en();    # study  (plain ASCII is unchanged)
+</span><span class="">  682: 
+</span><span class="">  683:     # Use encoded text safely inside HTML
+</span><span class="">  684:     my $html = &quot;&lt;p&gt;&quot; . $t . &quot;&lt;/p&gt;&quot;;
+</span><span class="">  685: 
+</span><span class="">  686: =head3 API SPECIFICATION
+</span><span class="">  687: 
+</span><span class="">  688: =head4 Input
+</span><span class="">  689: 
+</span><span class="">  690:     None.
+</span><span class="">  691: 
+</span><span class="">  692: =head4 Output
+</span><span class="">  693: 
+</span><span class="">  694:     # Return::Set schema
+</span><span class="">  695:     on_success =&gt; $self    # the same Lingua::Text object, with texts encoded
+</span><span class="">  696: 
+</span><span class="">  697: =head3 FORMAL SPECIFICATION
+</span><span class="">  698: 
+</span><span class="">  699:     -- Let entity : STRING -&gt; STRING be HTML::Entities::encode_entities
+</span><span class="">  700:     -- and  dec   : STRING -&gt; STRING be utf8::decode (applied only when needed)
+</span><span class="">  701:     &acirc;&#148;&#140;&acirc;&#148;&#128; encode &acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  702:     &acirc;&#148;&#130; &Icirc;&#148;LinguaText
+</span><span class="">  703:     &acirc;&#148;&#130; &acirc;&#136;&#128; l : dom texts
+</span><span class="">  704:     &acirc;&#148;&#130;     &acirc;&#128;&cent; texts&#39;(l) = entity(dec(texts(l)))
+</span><span class="">  705:     &acirc;&#148;&#148;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;&acirc;&#148;&#128;
+</span><span class="">  706:     -- texts&#39; replaces every value; dom texts is unchanged.
+</span><span class="">  707: 
+</span><span class="">  708: =cut
+</span><span class="">  709: 
+</span><span class="">  710: sub encode {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">711 → 714 → 719</span></span>  711: 	my $self = shift;
+</span><span class="">  712: 
+</span><span class="">  713: 	# Iterate over keys to avoid stale iterator state from each()
+</span><span class="">  714: 	for my $lang (keys %{$self-&gt;{&#39;texts&#39;}}) {
+</span><span class="">  715: 		my $v = $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
+</span><span class="">  716: 		utf8::decode($v) unless utf8::is_utf8($v);
+</span><span class="">  717: 		$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = HTML::Entities::encode_entities($v);
+</span><span class="">  718: 	}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  719: 	return $self;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  720: }
+</span><span class="">  721: 
+</span><span class="">  722: =head2 Language accessor methods
+</span><span class="">  723: 
+</span><span class="">  724: =head3 PURPOSE
+</span><span class="">  725: 
+</span><span class="">  726: Any two-letter method name that is a valid ISO 639-1 language code acts as a
+</span><span class="">  727: combined getter and setter for that language&#39;s translation.  These methods do
+</span><span class="">  728: not need to be declared; Perl&#39;s C&lt;AUTOLOAD&gt; mechanism intercepts them.
+</span><span class="">  729: 
+</span><span class="">  730:     $t-&gt;en(&#39;Hello&#39;);          # store an English translation
+</span><span class="">  731:     my $text = $t-&gt;fr();      # retrieve the French translation (undef if not stored)
+</span><span class="">  732:     $t-&gt;zh(&#39;&#39;);               # store an empty string (distinct from undef/not-stored)
+</span><span class="">  733:     $t-&gt;en(0);                # store the string &quot;0&quot; (falsy values work correctly)
+</span><span class="">  734: 
+</span><span class="">  735: =head3 ARGUMENTS
+</span><span class="">  736: 
+</span><span class="">  737: =over 4
+</span><span class="">  738: 
+</span><span class="">  739: =item B&lt;Setter form&gt; -- pass one scalar argument
+</span><span class="">  740: 
+</span><span class="">  741: The value is stored under the method&#39;s language code and also returned.
+</span><span class="">  742: 
+</span><span class="">  743: =item B&lt;Getter form&gt; -- call with no arguments
+</span><span class="">  744: 
+</span><span class="">  745: Returns the stored string for that language, or C&lt;undef&gt; if nothing has been
+</span><span class="">  746: stored.
+</span><span class="">  747: 
+</span><span class="">  748: =back
+</span><span class="">  749: 
+</span><span class="">  750: =head3 RETURN VALUE
+</span><span class="">  751: 
+</span><span class="">  752: =over 4
+</span><span class="">  753: 
+</span><span class="">  754: =item Returns the stored translation string (getter) or the value just stored
+</span><span class="">  755: (setter).
+</span><span class="">  756: 
+</span><span class="">  757: =item Returns C&lt;undef&gt; -- silently -- when the language has no stored
+</span><span class="">  758: translation.
+</span><span class="">  759: 
+</span><span class="">  760: =item Returns C&lt;undef&gt; silently for any method name that is not a recognised
+</span><span class="">  761: two-letter ISO 639-1 code.  This means typos (e.g. C&lt;$t-E&lt;gt&gt;enn()&gt;) fail
+</span><span class="">  762: invisibly.  See L&lt;/COMMON PITFALLS&gt;.
+</span><span class="">  763: 
+</span><span class="">  764: =back
+</span><span class="">  765: 
+</span><span class="">  766: =head3 EXAMPLE
+</span><span class="">  767: 
+</span><span class="">  768:     my $t = Lingua::Text-&gt;new();
+</span><span class="">  769: 
+</span><span class="">  770:     $t-&gt;en(&#39;Good morning&#39;);
+</span><span class="">  771:     $t-&gt;fr(&#39;Bonjour&#39;);
+</span><span class="">  772:     $t-&gt;de(&#39;Guten Morgen&#39;);
+</span><span class="">  773: 
+</span><span class="">  774:     print $t-&gt;en(), &quot;\n&quot;;   # Good morning
+</span><span class="">  775:     print $t-&gt;ja(), &quot;\n&quot;;   # (nothing -- no Japanese stored)
+</span><span class="">  776: 
+</span><span class="">  777:     # Chaining setters is not supported; use set() for that.
+</span><span class="">  778:     # Setters return the stored value, not $self.
+</span><span class="">  779: 
+</span><span class="">  780: =head3 API SPECIFICATION
+</span><span class="">  781: 
+</span><span class="">  782: =head4 Input
+</span><span class="">  783: 
+</span><span class="">  784:     # Setter: one positional SCALAR (may be undef, &#39;&#39;, or &#39;0&#39;)
+</span><span class="">  785:     # Getter: no arguments
+</span><span class="">  786: 
+</span><span class="">  787: =head4 Output
+</span><span class="">  788: 
+</span><span class="">  789:     # Return::Set schema
+</span><span class="">  790:     on_set     =&gt; SCALAR | undef    # the value just stored
+</span><span class="">  791:     on_get     =&gt; SCALAR | undef    # the stored value, or undef if absent
+</span><span class="">  792:     on_invalid =&gt; undef             # silently, for non-language method names
+</span><span class="">  793: 
+</span><span class="">  794: =head3 MESSAGES
+</span><span class="">  795: 
+</span><span class="">  796: None.  All failure cases return C&lt;undef&gt; silently.  See L&lt;/COMMON PITFALLS&gt;
+</span><span class="">  797: for guidance on typo detection.
+</span><span class="">  798: 
+</span><span class="">  799: =cut
+</span><span class="">  800: 
+</span><span class="">  801: sub AUTOLOAD {
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">802 → 812 → 816</span></span>  802: 	my $self = shift or return;
+</span><span class="">  803: 
+</span><span class="">  804: 	my ($key) = $AUTOLOAD =~ /::(\w+)$/;
+</span><span class="">  805: 
+</span><span class="">  806: 	return if $key eq &#39;DESTROY&#39;;
+</span><span class="">  807: 	return unless ref($self) eq __PACKAGE__;
+</span><span class="">  808: 	return unless $key =~ /^[a-z]{2}$/i;
+</span><span class="">  809: 	return unless _is_valid_language($key);
+</span><span class="">  810: 
+</span><span class="">  811: 	# Use @_ presence (not truthiness) so falsy values like &#39;0&#39; or &#39;&#39; are stored
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  812: 	if(@_) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  813: 		$self-&gt;{&#39;texts&#39;}-&gt;{$key} = shift;
+</span><span class="">  814: 	}
+</span><span class="">  815: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  816: 	return $self-&gt;{&#39;texts&#39;}-&gt;{$key};
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  817: }
+</span><span class="">  818: 
+</span><span class="">  819: =head1 COMMON PITFALLS
+</span><span class="">  820: 
+</span><span class="">  821: This section documents behaviours that often surprise first-time users.
+</span><span class="">  822: 
+</span><span class="">  823: =head2 encode() cannot be undone
+</span><span class="">  824: 
+</span><span class="">  825: C&lt;encode()&gt; modifies the object in place.  There is no C&lt;decode()&gt;.  If you
+</span><span class="">  826: call C&lt;encode()&gt; twice on the same object, every special character is encoded
+</span><span class="">  827: twice (e.g. C&lt;&amp;eacute;&gt; becomes C&lt;&amp;amp;eacute;&gt;).  Always call C&lt;encode()&gt;
+</span><span class="">  828: once, as the last step, and only on a freshly built object.
+</span><span class="">  829: 
+</span><span class="">  830:     # WRONG -- double-encoding
+</span><span class="">  831:     my $t = Lingua::Text-&gt;new(fr =&gt; &quot;\x{E9}tude&quot;)-&gt;encode()-&gt;encode();
+</span><span class="">  832:     print $t-&gt;fr();    # &amp;amp;eacute;tude  (broken HTML)
+</span><span class="">  833: 
+</span><span class="">  834:     # CORRECT
+</span><span class="">  835:     my $t = Lingua::Text-&gt;new(fr =&gt; &quot;\x{E9}tude&quot;)-&gt;encode();
+</span><span class="">  836:     print $t-&gt;fr();    # &amp;eacute;tude
+</span><span class="">  837: 
+</span><span class="">  838: =head2 Missing translation returns undef, not an empty string
+</span><span class="">  839: 
+</span><span class="">  840: When a translation is not stored for the requested language, C&lt;as_string()&gt;
+</span><span class="">  841: and the accessor methods return C&lt;undef&gt;, not C&lt;&quot;&quot;&gt;.  Use C&lt;defined()&gt; to test
+</span><span class="">  842: for absence, not a truth check.
+</span><span class="">  843: 
+</span><span class="">  844:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;hello&#39;);
+</span><span class="">  845: 
+</span><span class="">  846:     my $de = $t-&gt;de();
+</span><span class="">  847:     print &quot;Missing\n&quot; unless defined($de);   # correct
+</span><span class="">  848:     print &quot;Missing\n&quot; unless $de;            # WRONG -- also triggers for $de = &#39;0&#39;
+</span><span class="">  849: 
+</span><span class="">  850: =head2 Typos in language codes are silent
+</span><span class="">  851: 
+</span><span class="">  852: The AUTOLOAD accessor returns C&lt;undef&gt; for any two-letter name that is not a
+</span><span class="">  853: valid ISO 639-1 code, and also for valid codes that have no stored translation.
+</span><span class="">  854: A typo like C&lt;$t-E&lt;gt&gt;enn()&gt; produces C&lt;undef&gt; without any warning.
+</span><span class="">  855: 
+</span><span class="">  856:     $t-&gt;en(&#39;hello&#39;);
+</span><span class="">  857:     print $t-&gt;enn();    # undef -- no warning, no error
+</span><span class="">  858: 
+</span><span class="">  859: To guard against this, always check with C&lt;defined()&gt; and, during development,
+</span><span class="">  860: consider adding a test that verifies the expected languages are present.
+</span><span class="">  861: 
+</span><span class="">  862: =head2 new(&#39;text&#39;) silently drops the text when no locale is set
+</span><span class="">  863: 
+</span><span class="">  864: When you pass a single string to C&lt;new()&gt;, it is stored under the current
+</span><span class="">  865: system language.  If no locale environment variable (C&lt;LANG&gt;, C&lt;LC_MESSAGES&gt;,
+</span><span class="">  866: etc.) is set, the language cannot be determined and the text is silently
+</span><span class="">  867: discarded.
+</span><span class="">  868: 
+</span><span class="">  869:     # Safe: locale is set
+</span><span class="">  870:     $ENV{LANG} = &#39;en_GB.UTF-8&#39;;
+</span><span class="">  871:     my $t = Lingua::Text-&gt;new(&#39;hello&#39;);
+</span><span class="">  872:     print $t-&gt;en();   # hello
+</span><span class="">  873: 
+</span><span class="">  874:     # Unsafe: no locale
+</span><span class="">  875:     delete $ENV{LANG};
+</span><span class="">  876:     delete $ENV{LC_MESSAGES};
+</span><span class="">  877:     my $t = Lingua::Text-&gt;new(&#39;hello&#39;);   # text is lost
+</span><span class="">  878:     print defined($t-&gt;en()) ? $t-&gt;en() : &#39;lost&#39;;   # lost
+</span><span class="">  879: 
+</span><span class="">  880:     # Safe alternative: always name the language explicitly
+</span><span class="">  881:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;hello&#39;);
+</span><span class="">  882: 
+</span><span class="">  883: =head2 set() and the language accessors return $self or the value, not the text
+</span><span class="">  884: 
+</span><span class="">  885: C&lt;set()&gt; returns the object (C&lt;$self&gt;).  Because of the stringify overload,
+</span><span class="">  886: when you print or compare the return value, it I&lt;looks&gt; like a string -- but it
+</span><span class="">  887: is an object.  Do not rely on this behaviour; retrieve the value separately.
+</span><span class="">  888: 
+</span><span class="">  889:     my $t = Lingua::Text-&gt;new();
+</span><span class="">  890:     my $result = $t-&gt;set(text =&gt; &#39;Hello&#39;, lang =&gt; &#39;en&#39;);
+</span><span class="">  891: 
+</span><span class="">  892:     # $result is the Lingua::Text object, not the string &#39;Hello&#39;
+</span><span class="">  893:     # This works due to stringify overload, but is misleading:
+</span><span class="">  894:     print $result;          # Hello (via stringify)
+</span><span class="">  895: 
+</span><span class="">  896:     # Clearer intent:
+</span><span class="">  897:     $t-&gt;set(text =&gt; &#39;Hello&#39;, lang =&gt; &#39;en&#39;);
+</span><span class="">  898:     print $t-&gt;as_string(&#39;en&#39;);   # Hello
+</span><span class="">  899: 
+</span><span class="">  900: The AUTOLOAD setter (e.g. C&lt;$t-E&lt;gt&gt;en(&#39;Hello&#39;)&gt;) returns the stored value
+</span><span class="">  901: directly, not C&lt;$self&gt;.
+</span><span class="">  902: 
+</span><span class="">  903: =head2 A Lingua::Text object is always true
+</span><span class="">  904: 
+</span><span class="">  905: The object overloads the boolean C&lt;bool&gt; operator to always return true, even
+</span><span class="">  906: when it contains no translations.  Do B&lt;not&gt; use an object as a truth test to
+</span><span class="">  907: check whether it has any content.
+</span><span class="">  908: 
+</span><span class="">  909:     my $t = Lingua::Text-&gt;new();   # empty
+</span><span class="">  910:     if($t) { print &quot;always reached\n&quot;; }   # always true
+</span><span class="">  911: 
+</span><span class="">  912:     # To check whether a specific language is stored:
+</span><span class="">  913:     if(defined($t-&gt;en())) { print &quot;English is stored\n&quot;; }
+</span><span class="">  914: 
+</span><span class="">  915: =head2 Function-style call with arguments is an error
+</span><span class="">  916: 
+</span><span class="">  917: Perl allows calling methods as functions, but Lingua::Text::new() (with
+</span><span class="">  918: double-colon and arguments) will emit a warning and return C&lt;undef&gt;.
+</span><span class="">  919: 
+</span><span class="">  920:     my $t = Lingua::Text::new(en =&gt; &#39;hi&#39;);   # WRONG -- carp warning, returns undef
+</span><span class="">  921:     my $t = Lingua::Text-&gt;new(en =&gt; &#39;hi&#39;);   # correct
+</span><span class="">  922: 
+</span><span class="">  923: Calling C&lt;Lingua::Text::new()&gt; with B&lt;no&gt; arguments works (it creates an empty
+</span><span class="">  924: object), but the arrow form is still preferred.
+</span><span class="">  925: 
+</span><span class="">  926: =head1 LIMITATIONS
+</span><span class="">  927: 
+</span><span class="">  928: =over 4
+</span><span class="">  929: 
+</span><span class="">  930: =item * B&lt;No decode()&gt;: Once C&lt;encode()&gt; is called, all translations are
+</span><span class="">  931: HTML-entity-encoded.  There is no method to reverse this.
+</span><span class="">  932: 
+</span><span class="">  933: =item * B&lt;No language fallback&gt;: If C&lt;en_GB&gt; is the system locale but only
+</span><span class="">  934: C&lt;en&gt; is stored, the module finds the text correctly (because the country
+</span><span class="">  935: suffix is stripped).  However, if C&lt;en_GB&gt; is stored as a key and the system
+</span><span class="">  936: locale is C&lt;en_US&gt;, the text is I&lt;not&gt; found.  Only two-letter codes are used
+</span><span class="">  937: as storage keys.
+</span><span class="">  938: 
+</span><span class="">  939: =item * B&lt;Silent AUTOLOAD failures&gt;: Unrecognised method names (including
+</span><span class="">  940: typos) return C&lt;undef&gt; without any diagnostic.
+</span><span class="">  941: 
+</span><span class="">  942: =item * B&lt;Object::Configure semantics&gt;: The exact effect of
+</span><span class="">  943: L&lt;Object::Configure&gt; depends on the installed version and any project-level
+</span><span class="">  944: configuration present.  Without a configuration file, it passes parameters
+</span><span class="">  945: through unchanged.
+</span><span class="">  946: 
+</span><span class="">  947: =back
+</span><span class="">  948: 
+</span><span class="">  949: =head1 DEPENDENCIES
+</span><span class="">  950: 
+</span><span class="">  951: Runtime:
+</span><span class="">  952: 
+</span><span class="">  953: =over 4
+</span><span class="">  954: 
+</span><span class="">  955: =item * L&lt;Carp&gt; -- C&lt;carp&gt;/C&lt;croak&gt; for warnings and errors
+</span><span class="">  956: 
+</span><span class="">  957: =item * L&lt;HTML::Entities&gt; -- HTML entity encoding in C&lt;encode()&gt;
+</span><span class="">  958: 
+</span><span class="">  959: =item * L&lt;I18N::LangTags::Detect&gt; -- locale detection from environment variables
+</span><span class="">  960: 
+</span><span class="">  961: =item * L&lt;Object::Configure&gt; -- optional config-file defaults for C&lt;new()&gt;
+</span><span class="">  962: 
+</span><span class="">  963: =item * L&lt;Params::Get&gt; -- flexible argument parsing for public methods
+</span><span class="">  964: 
+</span><span class="">  965: =item * L&lt;Readonly&gt; -- constant definitions for the message catalog and patterns
+</span><span class="">  966: 
+</span><span class="">  967: =item * L&lt;Scalar::Util&gt; -- C&lt;blessed()&gt; for safe type testing
+</span><span class="">  968: 
+</span><span class="">  969: =item * L&lt;Sub::Private&gt; -- enforcement of private method access
+</span><span class="">  970: 
+</span><span class="">  971: =back
+</span><span class="">  972: 
+</span><span class="">  973: =head1 AUTHOR
+</span><span class="">  974: 
+</span><span class="">  975: Nigel Horne, C&lt;&lt; &lt;njh at nigelhorne.com&gt; &gt;&gt;
+</span><span class="">  976: 
+</span><span class="">  977: =head1 BUGS
+</span><span class="">  978: 
+</span><span class="">  979: Please report bugs at L&lt;https://github.com/nigelhorne/Lingua-Text/issues&gt;.
+</span><span class="">  980: 
+</span><span class="">  981: =head1 SEE ALSO
+</span><span class="">  982: 
+</span><span class="">  983: =over 4
+</span><span class="">  984: 
+</span><span class="">  985: =item * L&lt;Object::Configure&gt; -- runtime object configuration
+</span><span class="">  986: 
+</span><span class="">  987: =item * L&lt;I18N::LangTags::Detect&gt; -- the locale detection module used internally
+</span><span class="">  988: 
+</span><span class="">  989: =item * L&lt;HTML::Entities&gt; -- the HTML encoding module used by C&lt;encode()&gt;
+</span><span class="">  990: 
+</span><span class="">  991: =item * L&lt;Test Dashboard|https://nigelhorne.github.io/CGI-Info/coverage/&gt;
+</span><span class="">  992: 
+</span><span class="">  993: =back
+</span><span class="">  994: 
+</span><span class="">  995: =head1 SUPPORT
+</span><span class="">  996: 
+</span><span class="">  997: This module is provided as-is without any warranty.
+</span><span class="">  998: 
+</span><span class="">  999: Documentation:
+</span><span class=""> 1000: 
+</span><span class=""> 1001:     perldoc Lingua::Text
+</span><span class=""> 1002: 
+</span><span class=""> 1003: Online resources:
+</span><span class=""> 1004: 
+</span><span class=""> 1005: =over 4
+</span><span class=""> 1006: 
+</span><span class=""> 1007: =item * MetaCPAN: L&lt;https://metacpan.org/release/Lingua-Text&gt;
+</span><span class=""> 1008: 
+</span><span class=""> 1009: =item * Bug tracker: L&lt;https://rt.cpan.org/NoAuth/Bugs.html?Dist=Lingua-Text&gt;
+</span><span class=""> 1010: 
+</span><span class=""> 1011: =item * CPANTS: L&lt;http://cpants.cpanauthors.org/dist/Lingua-Text&gt;
+</span><span class=""> 1012: 
+</span><span class=""> 1013: =item * CPAN Testers: L&lt;http://matrix.cpantesters.org/?dist=Lingua-Text&gt;
+</span><span class=""> 1014: 
+</span><span class=""> 1015: =item * Dependencies: L&lt;http://deps.cpantesters.org/?module=Lingua-Text&gt;
+</span><span class=""> 1016: 
+</span><span class=""> 1017: =back
+</span><span class=""> 1018: 
+</span><span class=""> 1019: =head1 LICENCE AND COPYRIGHT
+</span><span class=""> 1020: 
+</span><span class=""> 1021: Copyright 2021-2026 Nigel Horne.
+</span><span class=""> 1022: 
+</span><span class=""> 1023: Usage is subject to the GPL2 licence terms.
+</span><span class=""> 1024: If you use it, please let me know.
+</span><span class=""> 1025: 
+</span><span class=""> 1026: =cut
+</span><span class=""> 1027: 
+</span><span class=""> 1028: 1;
 </span></pre>
 
 <script>
