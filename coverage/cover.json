@@ -4,364 +4,375 @@
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185160.61386,
+         "finish" : 1787185856.08875,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "-e",
-         "start" : 1787185150.83268,
-         "version" : "0.07"
+         "start" : 1787185843.12838,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185150.94419,
+         "finish" : 1787185843.27383,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "-e",
-         "start" : 1787185150.94408,
-         "version" : "0.07"
+         "start" : 1787185843.27369,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185151.21242,
+         "finish" : 1787185843.63061,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/00-load.t",
-         "start" : 1787185151.21139,
-         "version" : "0.07"
+         "start" : 1787185843.62926,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185151.54556,
+         "finish" : 1787185844.06284,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/10-new.t",
-         "start" : 1787185151.52316,
-         "version" : "0.07"
+         "start" : 1787185844.03392,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185151.89269,
+         "finish" : 1787185844.5115,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/30-basics.t",
-         "start" : 1787185151.8709,
-         "version" : "0.07"
+         "start" : 1787185844.48497,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185152.23295,
+         "finish" : 1787185844.94922,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/carp.t",
-         "start" : 1787185152.2102,
-         "version" : "0.07"
+         "start" : 1787185844.91994,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185152.7576,
+         "finish" : 1787185845.64538,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/cgi_security.t",
-         "start" : 1787185152.56311,
-         "version" : "0.07"
+         "start" : 1787185845.39218,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185153.02693,
+         "finish" : 1787185845.99488,
+         "name" : "Lingua-Text",
+         "perl" : "5.40.5",
+         "run" : "t/changes.t",
+         "start" : 1787185845.9946,
+         "version" : "0.08"
+      },
+      {
+         "OS" : "linux",
+         "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
+         "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
+         "finish" : 1787185846.22711,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/comment-spelling.t",
-         "start" : 1787185153.02672,
-         "version" : "0.07"
+         "start" : 1787185846.22681,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185153.41132,
+         "finish" : 1787185846.72531,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/data-flow.t",
-         "start" : 1787185153.30622,
-         "version" : "0.07"
+         "start" : 1787185846.58938,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185153.84836,
+         "finish" : 1787185847.29126,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/domain.t",
-         "start" : 1787185153.78829,
-         "version" : "0.07"
+         "start" : 1787185847.21348,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185154.46005,
+         "finish" : 1787185848.08335,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/edge_cases.t",
-         "start" : 1787185154.23702,
-         "version" : "0.07"
+         "start" : 1787185847.79878,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185154.77051,
+         "finish" : 1787185848.4819,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/eof.t",
-         "start" : 1787185154.77029,
-         "version" : "0.07"
+         "start" : 1787185848.4816,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185154.95027,
+         "finish" : 1787185848.71385,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/eol.t",
-         "start" : 1787185154.95006,
-         "version" : "0.07"
+         "start" : 1787185848.71356,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185155.35822,
+         "finish" : 1787185849.24707,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/function.t",
-         "start" : 1787185155.2326,
-         "version" : "0.07"
+         "start" : 1787185849.08028,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185155.82485,
+         "finish" : 1787185849.86767,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/integration.t",
-         "start" : 1787185155.74748,
-         "version" : "0.07"
+         "start" : 1787185849.76578,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185156.08812,
+         "finish" : 1787185850.21653,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/links.t",
-         "start" : 1787185156.08789,
-         "version" : "0.07"
+         "start" : 1787185850.21618,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185156.40074,
+         "finish" : 1787185850.62736,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/locales.t",
-         "start" : 1787185156.3622,
-         "version" : "0.07"
+         "start" : 1787185850.57538,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185156.80777,
+         "finish" : 1787185851.16018,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/logic.t",
-         "start" : 1787185156.73315,
-         "version" : "0.07"
+         "start" : 1787185851.06211,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185157.06349,
+         "finish" : 1787185851.49309,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/manifest.t",
-         "start" : 1787185157.06329,
-         "version" : "0.07"
+         "start" : 1787185851.49278,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185157.24198,
+         "finish" : 1787185851.72519,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/no404s.t",
-         "start" : 1787185157.24176,
-         "version" : "0.07"
+         "start" : 1787185851.72492,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185157.59189,
+         "finish" : 1787185852.1815,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/path.t",
-         "start" : 1787185157.52176,
-         "version" : "0.07"
+         "start" : 1787185852.08778,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185157.88743,
+         "finish" : 1787185852.56318,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-cm.t",
-         "start" : 1787185157.8872,
-         "version" : "0.07"
+         "start" : 1787185852.5629,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.06769,
+         "finish" : 1787185852.79387,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-coverage.t",
-         "start" : 1787185158.06748,
-         "version" : "0.07"
+         "start" : 1787185852.79359,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.24658,
+         "finish" : 1787185853.02421,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-snippets.t",
-         "start" : 1787185158.24637,
-         "version" : "0.07"
+         "start" : 1787185853.02394,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.4261,
+         "finish" : 1787185853.25648,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-spelling.t",
-         "start" : 1787185158.42588,
-         "version" : "0.07"
+         "start" : 1787185853.25618,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.60424,
+         "finish" : 1787185853.48795,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod-synopsis.t",
-         "start" : 1787185158.60401,
-         "version" : "0.07"
+         "start" : 1787185853.48768,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.78336,
+         "finish" : 1787185853.71837,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/pod.t",
-         "start" : 1787185158.78315,
-         "version" : "0.07"
+         "start" : 1787185853.7181,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185158.98397,
+         "finish" : 1787185853.97469,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/port.t",
-         "start" : 1787185158.98373,
-         "version" : "0.07"
+         "start" : 1787185853.97431,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185159.16981,
+         "finish" : 1787185854.21229,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/strict.t",
-         "start" : 1787185159.1696,
-         "version" : "0.07"
+         "start" : 1787185854.21202,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185159.46855,
+         "finish" : 1787185854.61365,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/text.t",
-         "start" : 1787185159.43593,
-         "version" : "0.07"
+         "start" : 1787185854.57108,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185159.84065,
+         "finish" : 1787185855.08967,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/transaction.t",
-         "start" : 1787185159.80545,
-         "version" : "0.07"
+         "start" : 1787185855.04489,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185160.30833,
+         "finish" : 1787185855.69621,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/unit.t",
-         "start" : 1787185160.20861,
-         "version" : "0.07"
+         "start" : 1787185855.56489,
+         "version" : "0.08"
       },
       {
          "OS" : "linux",
          "abstract" : "Store the same text in many languages; retrieve it in the user's language automatically",
          "dir" : "/home/runner/work/Lingua-Text/Lingua-Text",
-         "finish" : 1787185160.58339,
+         "finish" : 1787185856.04991,
          "name" : "Lingua-Text",
          "perl" : "5.40.5",
          "run" : "t/vars.t",
-         "start" : 1787185160.58317,
-         "version" : "0.07"
+         "start" : 1787185856.04961,
+         "version" : "0.08"
       }
    ],
    "summary" : {
