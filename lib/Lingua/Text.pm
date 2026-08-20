@@ -276,16 +276,16 @@ C<logger>, C<config_path>) are skipped.
 
 =back
 
-    # Equivalence partitions for language keys
-    #
-    # PARTITION          EXAMPLE    AUTOLOAD    encode()
-    # --------------------------------------------------------
-    # 2-lower (valid)    'en'       YES         YES
-    # 2-lower + _XX      'en_US'    NO          YES
-    # 1 char             'e'        NO          NO
-    # 3+ chars           'eng'      NO          NO
-    # uppercase          'EN'       NO          NO
-    # non-alpha          '12'       NO          NO
+    Equivalence partitions for language keys
+
+    PARTITION          EXAMPLE    AUTOLOAD    encode()
+    --------------------------------------------------------
+    2-lower (valid)    'en'       YES         YES
+    2-lower + _XX      'en_US'    NO          YES
+    1 char             'e'        NO          NO
+    3+ chars           'eng'      NO          NO
+    uppercase          'EN'       NO          NO
+    non-alpha          '12'       NO          NO
 
 =head4 Output
 
