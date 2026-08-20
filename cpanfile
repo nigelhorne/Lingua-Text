@@ -1,15 +1,15 @@
 # Generated from Makefile.PL using makefilepl2cpanfile
 
-requires 'perl', '5.6.2';
+requires 'perl', '5.010';
 
 requires 'Carp';
-requires 'Exporter';
-requires 'ExtUtils::MakeMaker', '6.64';   # 6.64 for TEST_REQUIRES
 requires 'HTML::Entities';
 requires 'I18N::LangTags::Detect';
 requires 'Object::Configure';
 requires 'Params::Get';
+requires 'Readonly';
 requires 'Scalar::Util';
+requires 'Sub::Private';
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
@@ -30,6 +30,7 @@ on 'test' => sub {
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';
+	requires 'Test::CPAN::Changes';
 	requires 'Test::Pod';
 	requires 'Test::Pod::Coverage';
 };

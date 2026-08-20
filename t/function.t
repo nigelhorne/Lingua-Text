@@ -585,10 +585,13 @@ subtest '_err -- private message formatter' => sub {
 		'Lingua::Text: use ->new() not ::new() to instantiate',
 		'_err(new_oo_style): formats correctly');
 
-	# Unknown key: must not die; must describe the problem in the fallback
-	like(Lingua::Text::_err('no_such_key'),
-		qr/Unknown internal error: no_such_key/,
-		'_err(unknown key): falls back to generic message without dying');
+	# Unknown key: must confess with the bad key name so the programmer sees
+	# it immediately at the call site rather than getting a silent wrong message.
+	throws_ok(
+		sub { Lingua::Text::_err('no_such_key') },
+		qr/Internal error.*no_such_key/,
+		'_err(unknown key): confesses with key name in message',
+	);
 };
 
 # ---------------------------------------------------------------------------

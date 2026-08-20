@@ -4,7 +4,7 @@ Lingua::Text - Store the same text in many languages; retrieve it in the user's 
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -80,6 +80,12 @@ the first one it finds that contains a two-letter language code:
 - 2. `LC_ALL`
 - 3. `LC_MESSAGES`
 - 4. `LANG` (e.g. `en_US.UTF-8` or `de_DE`)
+
+In CGI or web environments, `I18N::LangTags::Detect` also inspects the
+`HTTP_ACCEPT_LANGUAGE` request header (when available in the environment)
+before falling back to the variables above.  The memoisation cache tracks
+this variable alongside the four above, so the cache is invalidated
+correctly when the header changes between requests.
 
 Only the first two letters are used (e.g. `en_GB.UTF-8` becomes `en`), so
 you only need to store one translation per language, not per locale variant.

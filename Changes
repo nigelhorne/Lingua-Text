@@ -1,6 +1,6 @@
 Revision history for Lingua-Text
 
-0.08
+0.08	Wed Aug 19 08:25:16 PM EDT 2026
 	[ Enhancements ]
 	- Validate the language in AUTOLOAD
 	- Only allow 2-letter language codes

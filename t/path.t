@@ -833,17 +833,19 @@ subtest '_err() P-E1: known key -> formatted message' => sub {
 };
 
 # ===========================================================================
-# _err() -- P-E2: unknown key -> defensive fallback (currently dead code)
+# _err() -- P-E2: unknown key -> Carp::confess (defensive guard)
 #
-# No existing caller passes an unknown key, making this branch unreachable
-# from the module's own code.  It is retained defensively and tested here
-# to prove that the fallback path at least produces sensible output.
-# See the TODO comment added to lib/Lingua/Text.pm above this branch.
+# No existing caller passes an unknown key; all hard-code a key present in
+# %MESSAGES.  The branch is a defensive guard for future callers: it confess-
+# dies so a programmer who adds a new call site without updating %MESSAGES gets
+# an immediate, clearly attributed error rather than a silent wrong message.
 # ===========================================================================
-subtest '_err() P-E2: unknown key -> defensive fallback (dead code for current callers)' => sub {
-	my $msg = Lingua::Text::_err('__nonexistent_key_42__');
-	like($msg, qr/Unknown internal error/, 'P-E2: defensive fallback text present');
-	like($msg, qr/__nonexistent_key_42__/, 'P-E2: unknown key name echoed back');
+subtest '_err() P-E2: unknown key -> confess (defensive guard for future callers)' => sub {
+	throws_ok(
+		sub { Lingua::Text::_err('__nonexistent_key_42__') },
+		qr/Internal error.*__nonexistent_key_42__/,
+		'P-E2: unknown key causes confess with key name in message',
+	);
 };
 
 # ===========================================================================

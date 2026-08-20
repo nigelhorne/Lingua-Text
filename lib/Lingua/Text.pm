@@ -23,11 +23,11 @@ Lingua::Text - Store the same text in many languages; retrieve it in the user's 
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 our $AUTOLOAD;
 
 # ---------------------------------------------------------------------------
@@ -146,6 +146,12 @@ the first one it finds that contains a two-letter language code:
 =item 4. C<LANG> (e.g. C<en_US.UTF-8> or C<de_DE>)
 
 =back
+
+In CGI or web environments, C<I18N::LangTags::Detect> also inspects the
+C<HTTP_ACCEPT_LANGUAGE> request header (when available in the environment)
+before falling back to the variables above.  The memoisation cache tracks
+this variable alongside the four above, so the cache is invalidated
+correctly when the header changes between requests.
 
 Only the first two letters are used (e.g. C<en_GB.UTF-8> becomes C<en>), so
 you only need to store one translation per language, not per locale variant.
@@ -890,12 +896,10 @@ sub _err :Private {
 	my ($key) = @_;
 	my $fmt = $MESSAGES{$key};
 	return sprintf($fmt, __PACKAGE__) if defined($fmt);
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# All current callers pass a hard-coded key that exists in %MESSAGES, so this
-	# branch is dead for every reachable path in the module.  It is retained as a
-	# defensive fallback in case a future caller introduces a new key without
-	# updating %MESSAGES, but it cannot be triggered by any existing code path.
-	return "Unknown internal error: $key";
+	# Defensive: a future caller added a new key without a matching %MESSAGES entry.
+	# confess rather than returning a string so the programmer sees the bad key
+	# immediately at the call site instead of getting a silent wrong message.
+	Carp::confess("Internal error: _err() called with unknown key '$key' -- add it to %MESSAGES");
 }
 
 # Purpose:  Issue a carp warning for a set() usage mistake and return undef.

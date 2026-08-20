@@ -28,13 +28,13 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
 		'Carp' => 0,
-		'Exporter' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# 6.64 for TEST_REQUIRES
 		'HTML::Entities' => 0,
 		'I18N::LangTags::Detect' => 0,
-		'Params::Get' => 0,
 		'Object::Configure' => 0,
-		'Scalar::Util' => 0
+		'Params::Get' => 0,
+		'Readonly' => 0,
+		'Scalar::Util' => 0,
+		'Sub::Private' => 0,
 	}, TEST_REQUIRES => {
 		'IPC::System::Simple' => 0,
 		'Test::Carp' => 0,
@@ -66,5 +66,5 @@ WriteMakefile(
 			}
 		},
 	},
-	MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+	MIN_PERL_VERSION	=> '5.010'	# use autodie and // (defined-or) require 5.010
 );
