@@ -364,11 +364,11 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">   23: 
 </span><span class="">   24: =head1 VERSION
 </span><span class="">   25: 
-</span><span class="">   26: Version 0.08
+</span><span class="">   26: Version 0.09
 </span><span class="">   27: 
 </span><span class="">   28: =cut
 </span><span class="">   29: 
-</span><span class="">   30: our $VERSION = &#39;0.08&#39;;
+</span><span class="">   30: our $VERSION = &#39;0.09&#39;;
 </span><span class="">   31: our $AUTOLOAD;
 </span><span class="">   32: 
 </span><span class="">   33: # ---------------------------------------------------------------------------
@@ -675,46 +675,46 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  334: 
 </span><span class="">  335: 	# Syllogism:
 </span><span class="">  336: 	# P1: A valid invocant is a Lingua::Text blessed object (clone path) or
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  337: 	#     a class name that inherits from Lingua::Text (isa check).
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  338: 	# P2: !defined($class) implies both $is_class and $is_object are false
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  339: 	#     (each requires defined($class) in their own derivation).
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  340: 	# Conclusion: De Morgan reduction -- the original
+</span><span class="">  337: 	#     a class name that inherits from Lingua::Text (isa check).
+</span><span class="">  338: 	# P2: !defined($class) implies both $is_class and $is_object are false
+</span><span class="">  339: 	#     (each requires defined($class) in their own derivation).
+</span><span class="">  340: 	# Conclusion: De Morgan reduction -- the original
 </span><span class="">  341: 	#   &quot;!defined || (!class &amp;&amp; !object)&quot;
 </span><span class="">  342: 	# is logically equivalent to &quot;!($is_object || $is_class)&quot;.
-</span><span class="">  343: 	unless($is_object || $is_class) {
-</span><span class="">  344: 		# undef invocant = bare Lingua::Text::new() with no args -- allowed
-</span><span class="">  345: 		if(defined($class)) {
-</span><span class="">  346: 			Carp::carp(_err(&#39;new_oo_style&#39;));
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  343: 	unless($is_object || $is_class) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  344: 		# undef invocant = bare Lingua::Text::new() with no args -- allowed
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  345: 		if(defined($class)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  346: 			Carp::carp(_err(&#39;new_oo_style&#39;));
 </span><span class="">  347: 			return;
 </span><span class="">  348: 		}
 </span><span class="">  349: 		$class = __PACKAGE__;
 </span><span class="">  350: 	}
 </span><span class="">  351: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  352: 	# Build the initial parameter hash from whatever form the caller used.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  353: 	# A single non-ref scalar is the positional form: store under the locale lang
+</span><span class="">  352: 	# Build the initial parameter hash from whatever form the caller used.
+</span><span class="">  353: 	# A single non-ref scalar is the positional form: store under the locale lang
 </span><span class="">  354: 	# if one is detected, or silently discard it when no locale is set (the
 </span><span class="">  355: 	# documented pitfall).  We must NOT let it reach get_params(), which croaks
 </span><span class="">  356: 	# on an odd-length list (get_params(undef, $scalar) = 1 arg = odd).
 </span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">357 → 358 → 366</span></span>  357: 	my $params;
-</span><span class="">  358: 	if((scalar(@_) == 1) &amp;&amp; (!ref($_[0]))) {
-</span><span class="">  359: 		my $lang = _get_language();
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  360: 		$params = { $lang =&gt; $_[0] } if $lang;
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  361: 	} elsif(@_) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  362: 		$params = Params::Get::get_params(undef, \@_);
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  363: 	}
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  364: 
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  365: 	# Clone path: caller is an existing object
-</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">366 → 366 → 374</span></span>  366: 	if($is_object) {
-</span><span class="">  367: 		if($params) {
-</span><span class="">  368: 			return bless { texts =&gt; {%{$class-&gt;{&#39;texts&#39;}}, %{$params}} }, ref($class);
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  369: 		}
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  370: 		return bless { %{$class} }, ref($class);
-</span><span class="">  371: 	}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  358: 	if((scalar(@_) == 1) &amp;&amp; (!ref($_[0]))) {
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  359: 		my $lang = _get_language();
+</span><span class="">  360: 		$params = { $lang =&gt; $_[0] } if $lang;
+</span><span class="">  361: 	} elsif(@_) {
+</span><span class="">  362: 		$params = Params::Get::get_params(undef, \@_);
+</span><span class="">  363: 	}
+</span><span class="">  364: 
+</span><span class="">  365: 	# Clone path: caller is an existing object
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">366 → 366 → 374</span></span>  366: 	if($is_object) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  367: 		if($params) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  368: 			return bless { texts =&gt; {%{$class-&gt;{&#39;texts&#39;}}, %{$params}} }, ref($class);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  369: 		}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  370: 		return bless { %{$class} }, ref($class);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  371: 	}
 </span><span class="">  372: 
 </span><span class="">  373: 	# Allow Object::Configure to inject defaults (e.g. from a config file)
 </span><span class="">  374: 	$params = Object::Configure::configure($class, $params);
-</span><span class="">  375: 	return bless( $params ? { texts =&gt; $params } : {}, $class );
-</span><span class="">  376: }
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  375: 	return bless( $params ? { texts =&gt; $params } : {}, $class );
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  376: }
 </span><span class="">  377: 
 </span><span class="">  378: =head2 set
 </span><span class="">  379: 
@@ -844,27 +844,27 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  503: 
 </span><span class="">  504: 	Carp::croak(_err(&#39;set_no_args&#39;)) unless @_;
 </span><span class="">  505: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  506: 	my $params = Params::Get::get_params(&#39;text&#39;, @_);
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  507: 
+</span><span class="">  506: 	my $params = Params::Get::get_params(&#39;text&#39;, @_);
+</span><span class="">  507: 
 </span><span class="">  508: 	# SECURITY: use // (defined-or), not || (truthiness).
 </span><span class="">  509: 	# || would silently substitute the system locale when the caller explicitly
 </span><span class="">  510: 	# passes lang =&gt; &#39;&#39; or lang =&gt; &#39;0&#39;, masking an invalid-argument error.
 </span><span class="">  511: 	my $lang = $params-&gt;{&#39;lang&#39;} // _get_language();
-</span><span class="">  512: 	return _carp_set_usage() unless defined($lang);
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  513: 
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  514: 	# Syllogism:
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  512: 	return _carp_set_usage() unless defined($lang);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  513: 
+</span><span class="">  514: 	# Syllogism:
 </span><span class="">  515: 	# P1 (object invariant): every key in $self-&gt;{texts} must satisfy $LANG_RE.
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  516: 	# P2: $lang was resolved from caller input -- it may be any string.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  517: 	# Conclusion: validate at the API boundary before writing; reject here to
+</span><span class="">  516: 	# P2: $lang was resolved from caller input -- it may be any string.
+</span><span class="">  517: 	# Conclusion: validate at the API boundary before writing; reject here to
 </span><span class="">  518: 	#             maintain the invariant rather than letting bad keys propagate.
 </span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  519: 	return _carp_set_usage() unless _is_valid_language($lang);
 </span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  520: 
 </span><span class="">  521: 	my $text = $params-&gt;{&#39;text&#39;};
-</span><span class="">  522: 	return _carp_set_usage() unless defined($text);
-</span><span class="">  523: 
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  522: 	return _carp_set_usage() unless defined($text);
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  523: 
 </span><span class="">  524: 	$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = $text;
-</span><span class="">  525: 	return $self;
-</span><span class="">  526: }
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  525: 	return $self;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  526: }
 </span><span class="">  527: 
 </span><span class="">  528: =head2 as_string
 </span><span class="">  529: 
@@ -980,22 +980,22 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  639: 
 </span><span class="">  640: sub as_string {
 </span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">641 → 648 → 653</span></span>  641: 	my $self = shift;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  642: 
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  643: 	# Guard against the overload calling convention: Perl passes ($self, $other, $swap)
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  644: 	# when the &quot;&quot; handler is invoked during a comparison.  We only want the first arg.
+</span><span class="">  642: 
+</span><span class="">  643: 	# Guard against the overload calling convention: Perl passes ($self, $other, $swap)
+</span><span class="">  644: 	# when the &quot;&quot; handler is invoked during a comparison.  We only want the first arg.
 </span><span class="">  645: 	# Fast path: single positional scalar (e.g. as_string(&#39;en&#39;)) skips Params::Get
 </span><span class="">  646: 	# to avoid parameter-parsing overhead on what is often the hottest call site.
 </span><span class="">  647: 	my $lang;
-</span><span class="">  648: 	if(@_ &amp;&amp; defined($_[0])) {
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  649: 		if(my $params = Params::Get::get_params(&#39;lang&#39;, \@_)) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  650: 			$lang = $params-&gt;{&#39;lang&#39;};
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  651: 		}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  648: 	if(@_ &amp;&amp; defined($_[0])) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  649: 		if(my $params = Params::Get::get_params(&#39;lang&#39;, \@_)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  650: 			$lang = $params-&gt;{&#39;lang&#39;};
+</span><span class="">  651: 		}
 </span><span class="">  652: 	}
 </span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">653 → 655 → 658</span></span>  653: 	$lang //= _get_language();
 </span><span class="">  654: 
-</span><span class="">  655: 	if(defined($lang)) {
-</span><span class="">  656: 		return $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
-</span><span class="">  657: 	}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  655: 	if(defined($lang)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  656: 		return $self-&gt;{&#39;texts&#39;}-&gt;{$lang};
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  657: 	}
 </span><span class="">  658: 	Carp::carp(_err(&#39;str_usage&#39;));
 </span><span class="">  659: 	return;
 </span><span class="">  660: }
@@ -1067,14 +1067,14 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  726: 		# SECURITY V3: a caller may store undef via $t-&gt;en(undef).  utf8::decode(undef)
 </span><span class="">  727: 		# emits &quot;Use of uninitialized value&quot; under &#39;use warnings&#39; and is a no-op,
 </span><span class="">  728: 		# but encode_entities(undef) returns &#39;&#39; which silently drops the entry.
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  729: 		# Skip explicitly so the stored undef is preserved unchanged.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  730: 		next unless defined($v) &amp;&amp; !ref($v);
+</span><span class="">  729: 		# Skip explicitly so the stored undef is preserved unchanged.
+</span><span class="">  730: 		next unless defined($v) &amp;&amp; !ref($v);
 </span><span class="">  731: 
 </span><span class="">  732: 		utf8::decode($v) unless utf8::is_utf8($v);
 </span><span class="">  733: 		$self-&gt;{&#39;texts&#39;}-&gt;{$lang} = HTML::Entities::encode_entities($v);
 </span><span class="">  734: 	}
-</span><span class="">  735: 	return $self;
-</span><span class="">  736: }
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  735: 	return $self;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  736: }
 </span><span class="">  737: 
 </span><span class="">  738: =head2 Language accessor methods
 </span><span class="">  739: 
@@ -1207,31 +1207,31 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  866: 	# Each two-letter code gets its own closure installed exactly once.  This
 </span><span class="">  867: 	# reduces repeated accessor cost from AUTOLOAD overhead (~5 regex ops) to a
 </span><span class="">  868: 	# direct method dispatch, which is the dominant cost when rendering a page
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  869: 	# that stringifies many objects through the same language code.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  870: 	{
+</span><span class="">  869: 	# that stringifies many objects through the same language code.
+</span><span class="">  870: 	{
 </span><span class="">  871: 		no strict &#39;refs&#39;;
 </span><span class="">  872: 		*{__PACKAGE__ . &#39;::&#39; . $key} = sub {
 </span><span class="">  873: 			my $s = shift or return;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  874: 			$s-&gt;{&#39;texts&#39;}-&gt;{$key} = shift if @_;
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  875: 			return $s-&gt;{&#39;texts&#39;}-&gt;{$key};
-</span><span class="">  876: 		};
+</span><span class="">  874: 			$s-&gt;{&#39;texts&#39;}-&gt;{$key} = shift if @_;
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  875: 			return $s-&gt;{&#39;texts&#39;}-&gt;{$key};
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  876: 		};
 </span><span class="">  877: 	}
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  878: 
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  879: 	# Use @_ presence (not truthiness) so falsy values like &#39;0&#39; or &#39;&#39; are stored
-</span><span class="">  880: 	if(@_) {
-</span><span class="">  881: 		$self-&gt;{&#39;texts&#39;}-&gt;{$key} = shift;
+</span><span class="">  878: 
+</span><span class="">  879: 	# Use @_ presence (not truthiness) so falsy values like &#39;0&#39; or &#39;&#39; are stored
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  880: 	if(@_) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  881: 		$self-&gt;{&#39;texts&#39;}-&gt;{$key} = shift;
 </span><span class="">  882: 	}
 </span><span class="">  883: 
-</span><span class="">  884: 	return $self-&gt;{&#39;texts&#39;}-&gt;{$key};
-</span><span class="">  885: }
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  884: 	return $self-&gt;{&#39;texts&#39;}-&gt;{$key};
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  885: }
 </span><span class="">  886: 
 </span><span class="">  887: # ---------------------------------------------------------------------------
 </span><span class="">  888: # Private helpers
 </span><span class="">  889: # ---------------------------------------------------------------------------
 </span><span class="">  890: 
 </span><span class="">  891: # Purpose:  Format a message from the catalog with the package name filled in.
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  892: # Entry:    $key -- key into %MESSAGES.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  893: # Exit:     Formatted string ready for Carp.
+</span><span class="">  892: # Entry:    $key -- key into %MESSAGES.
+</span><span class="">  893: # Exit:     Formatted string ready for Carp.
 </span><span class="">  894: # Effects:  None.
 </span><span class="">  895: sub _err :Private {
 </span><span class="">  896: 	my ($key) = @_;
@@ -1272,60 +1272,60 @@ Approximate LCSAJ segments: 51<br>
 </span><span class="">  931: {
 </span><span class="">  932: 	my ($cached_lang, %cached_env);
 </span><span class="">  933: 
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  934: 	sub _get_language :Private {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  935: 		# Fast path: env vars unchanged since last call -- return cached result.
+</span><span class="">  934: 	sub _get_language :Private {
+</span><span class="">  935: 		# Fast path: env vars unchanged since last call -- return cached result.
 </span><span class="">  936: 		# Using &#39;exists&#39; rather than defined($cached_lang) so a cached undef is
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  937: 		# also served from cache (avoids re-probing an env with no locale set).
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">938 → 938 → 952</span></span>  938: 		if(exists $cached_env{LANG}) {
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  939: 			my $stale = 0;
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  940: 			for my $v (qw(LANGUAGE LC_ALL LC_MESSAGES LANG HTTP_ACCEPT_LANGUAGE)) {
-</span><span class="">  941: 				if(($ENV{$v} // &#39;&#39;) ne $cached_env{$v}) { $stale = 1; last }
-</span><span class="">  942: 			}
-</span><span class="">  943: 			return $cached_lang unless $stale;
-</span><span class="">  944: 		}
+</span><span class="">  937: 		# also served from cache (avoids re-probing an env with no locale set).
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">938 → 938 → 952</span></span>  938: 		if(exists $cached_env{LANG}) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  939: 			my $stale = 0;
+</span><span class="">  940: 			for my $v (qw(LANGUAGE LC_ALL LC_MESSAGES LANG HTTP_ACCEPT_LANGUAGE)) {
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  941: 				if(($ENV{$v} // &#39;&#39;) ne $cached_env{$v}) { $stale = 1; last }
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  942: 			}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  943: 			return $cached_lang unless $stale;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  944: 		}
 </span><span class="">  945: 
 </span><span class="">  946: 		# Slow path: probe the environment.
 </span><span class="">  947: 		# SECURITY V1 (taint mode): under perl -T, %ENV values are tainted.
 </span><span class="">  948: 		# Perl only untaints a substring via a regex CAPTURE GROUP -- the captured
 </span><span class="">  949: 		# $1 is untainted once the match succeeds.  substr() on a tainted string
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  950: 		# propagates taint, so the previous substr()-based extraction was wrong
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  951: 		# for taint-mode callers.  Restore explicit capturing groups here.
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">952 → 953 → 956</span></span>  952: 		my $lang;
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  953: 		for my $tag (I18N::LangTags::Detect::detect()) {
-</span><span class="">  954: 			if($tag =~ /^([a-z]{2})/i) { $lang = lc($1); last }    # $1 untainted
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  955: 		}
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">956 → 956 → 959</span></span>  956: 		if(!defined($lang) &amp;&amp; ($ENV{&#39;LANGUAGE&#39;} // &#39;&#39;) =~ /^([a-z]{2})/i) {
-</span><span class="">  957: 			$lang = lc($1);    # $1 untainted
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  958: 		}
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">959 → 959 → 971</span></span>  959: 		if(!defined($lang)) {
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  960: 			for my $var (&#39;LC_ALL&#39;, &#39;LC_MESSAGES&#39;, &#39;LANG&#39;) {
-</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  961: 				my $val = $ENV{$var} // next;
-</span><span class="">  962: 				if($val =~ /^([a-z]{2})/i) {
-</span><span class="">  963: 					my $code = lc($1);    # $1 untainted
-</span><span class="">  964: 					if(_is_valid_language($code)) { $lang = $code; last }
-</span><span class="">  965: 				}
+</span><span class="">  950: 		# propagates taint, so the previous substr()-based extraction was wrong
+</span><span class="">  951: 		# for taint-mode callers.  Restore explicit capturing groups here.
+</span><span class=""><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">952 → 953 → 956</span></span>  952: 		my $lang;
+</span><span class="">  953: 		for my $tag (I18N::LangTags::Detect::detect()) {
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  954: 			if($tag =~ /^([a-z]{2})/i) { $lang = lc($1); last }    # $1 untainted
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  955: 		}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">956 → 956 → 959</span></span>  956: 		if(!defined($lang) &amp;&amp; ($ENV{&#39;LANGUAGE&#39;} // &#39;&#39;) =~ /^([a-z]{2})/i) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  957: 			$lang = lc($1);    # $1 untainted
+</span><span class="">  958: 		}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic."><span class="lcsaj-tip"><span class="lcsaj-dot">●</span><span class="lcsaj-tip-text">959 → 959 → 971</span></span>  959: 		if(!defined($lang)) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  960: 			for my $var (&#39;LC_ALL&#39;, &#39;LC_MESSAGES&#39;, &#39;LANG&#39;) {
+</span><span class="">  961: 				my $val = $ENV{$var} // next;
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  962: 				if($val =~ /^([a-z]{2})/i) {
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  963: 					my $code = lc($1);    # $1 untainted
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  964: 					if(_is_valid_language($code)) { $lang = $code; last }
+</span><p> <b> Mutants (Total: 1, Killed: 1, Survived: 0)</b><p><span class="">  965: 				}
 </span><span class="">  966: 			}
 </span><span class="">  967: 		}
 </span><span class="">  968: 		# POSIX &#39;C&#39; locale is treated as English.
 </span><span class="">  969: 		# (?:\z|\.) matches &#39;C&#39; at end-of-string or &#39;C.&#39; (e.g. &#39;C.UTF-8&#39;).
 </span><span class="">  970: 		# Non-capturing group: the dot is tested but its value is never needed.
 </span><span class="">  971: 		$lang //= &#39;en&#39; if ($ENV{&#39;LANG&#39;} // &#39;&#39;) =~ /^C(?:\z|\.)/;
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  972: 
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  973: 		# Cache result and snapshot the five vars we check.
+</span><span class="">  972: 
+</span><span class="">  973: 		# Cache result and snapshot the five vars we check.
 </span><span class="">  974: 		$cached_lang    = $lang;
 </span><span class="">  975: 		$cached_env{$_} = $ENV{$_} // &#39;&#39; for qw(LANGUAGE LC_ALL LC_MESSAGES LANG HTTP_ACCEPT_LANGUAGE);
-</span><span class="">  976: 		return $lang;
-</span><span class="">  977: 	}
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  976: 		return $lang;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  977: 	}
 </span><span class="">  978: }
 </span><span class="">  979: 
 </span><span class="">  980: # Purpose:  Validate that a string is a well-formed language code accepted by
 </span><span class="">  981: #           this module (ISO 639-1 with optional ISO 3166-1 country suffix).
-</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  982: # Entry:    $lang -- candidate string.
-</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  983: # Exit:     True if $lang matches $LANG_RE; false otherwise.
+</span><span class="">  982: # Entry:    $lang -- candidate string.
+</span><span class="">  983: # Exit:     True if $lang matches $LANG_RE; false otherwise.
 </span><span class="">  984: sub _is_valid_language :Private {
 </span><span class="">  985: 	my ($lang) = @_;
-</span><span class="">  986: 	return $lang =~ $LANG_RE;
-</span><span class="">  987: }
+</span><span class="killed tooltip" data-tooltip="Mutations here were killed. Tests are effectively covering this logic.">  986: 	return $lang =~ $LANG_RE;
+</span><p> <b> Mutants (Total: 2, Killed: 2, Survived: 0)</b><p><span class="">  987: }
 </span><span class="">  988: 
 </span><span class="">  989: =head1 COMMON PITFALLS
 </span><span class="">  990: 
