@@ -4,7 +4,7 @@ Lingua::Text - Store the same text in many languages; retrieve it in the user's 
 
 # VERSION
 
-Version 0.09
+Version 0.10
 
 # SYNOPSIS
 

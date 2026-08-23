@@ -1,6 +1,6 @@
 Revision history for Lingua-Text
 
-0.10
+0.10	Sat Aug 22 09:32:26 PM EDT 2026
 	[ Bug Fixes ]
 	- The routines marked as private should have been marked as protected
 	  Fixes https://github.com/nigelhorne/Lingua-Text/issues/18

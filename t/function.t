@@ -61,7 +61,7 @@ subtest 'new -- construction paths' => sub {
 	# Method-style no-args: canonical empty construction
 	{
 		local %ENV;
-		my $t = Lingua::Text->new();
+		my $t = new_ok('Lingua::Text');
 		isa_ok($t, 'Lingua::Text', 'method-style no-args returns object');
 		ok(!defined($t->en()), 'empty object has no translations');
 	}
