@@ -4,11 +4,6 @@
 # Strategy: test every public and private function using equivalence
 # partitioning.  Each subtest covers one function and mocks its dependencies
 # so that only the unit under test is exercised.
-#
-# Private functions (_err, _is_valid_language, _get_language, _carp_set_usage)
-# are accessible because 'prove' sets HARNESS_ACTIVE, which Sub::Private uses
-# to bypass its enforcement gate.  The BEGIN below guarantees the flag is set
-# before 'use Lingua::Text' loads Sub::Private.
 
 use strict;
 use warnings;
@@ -646,12 +641,7 @@ subtest '_is_valid_language -- ISO 639-1 validation' => sub {
 # counts detect() invocations.
 # ---------------------------------------------------------------------------
 subtest '_get_language -- locale detection' => sub {
-	# $Sub::Private::BYPASS = 1 lets us call the private sub from this test
-	# package without relying on HARNESS_ACTIVE.  We need this because
-	# 'local %ENV' creates an EMPTY copy of %ENV, which wipes HARNESS_ACTIVE
-	# inside every inner {local %ENV; ...} block.
-	local $Sub::Private::BYPASS = 1;
-
+	local $Sub::Protected::BYPASS = 1;
 	# detect() tag takes precedence over all %ENV probing
 	{
 		local %ENV;
