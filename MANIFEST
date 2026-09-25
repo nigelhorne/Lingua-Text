@@ -20,7 +20,6 @@ t/eof.t
 t/eol.t
 t/function.t
 t/integration.t
-t/links.t
 t/locales.t
 t/logic.t
 t/manifest.t
@@ -28,6 +27,7 @@ t/no404s.t
 t/path.t
 t/pod-cm.t
 t/pod-coverage.t
+t/pod-links.t
 t/pod-snippets.t
 t/pod-spelling.t
 t/pod-synopsis.t
